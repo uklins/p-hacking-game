@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-Hacking：凑出你的"发现"</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --parchment:      #f4edd8;
+  --parchment-mid:  #ede3c5;
+  --parchment-dark: #e0d3ae;
+  --ink:            #1e130a;
+  --ink-mid:        #3d2810;
+  --ink-light:      #5a4030;
+  --amber:          #8b6914;
+  --amber-dark:     #6b4f10;
+  --amber-light:    #c49a30;
+  --border:         #c8b48a;
+  --border-light:   #ddd0b0;
+  --green-dark:     #1a5c2a;
+  --green-mid:      #2d7a40;
+  --green-bg:       #eaf3ec;
+  --blue-bar:       #4a6fa5;
+  --red-bar:        #a54a4a;
+}
+
+html { font-size: 16px; }
+
+body {
+  font-family: Georgia, 'Times New Roman', 'Noto Serif SC', serif;
+  background: var(--parchment);
+  color: var(--ink);
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.site-header {
+  background: var(--parchment-dark);
+  border-bottom: 2px solid var(--amber);
+  padding: 1.4rem 2rem 1.2rem;
+  text-align: center;
+}
+.site-header h1 {
+  font-size: 1.75rem;
+  font-weight: normal;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+.site-header .tagline {
+  margin-top: 0.25rem;
+  font-size: 0.88rem;
+  color: var(--ink-light);
+  font-style: italic;
+}
+
+/* ── Layout ── */
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.8rem 1.5rem;
+  display: grid;
+  grid-template-columns: 330px 1fr;
+  grid-template-rows: auto 1fr auto;
+  gap: 1.4rem;
+}
+
+/* ── Hypothesis banner ── */
+.hypothesis {
+  grid-column: 1 / -1;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--amber);
+  background: white;
+  padding: 0.9rem 1.4rem;
+}
+.hypothesis .label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--amber-dark);
+  margin-bottom: 0.2rem;
+}
+.hypothesis .claim {
+  font-size: 1.08rem;
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* ── Controls panel ── */
+.controls {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 1.4rem 1.3rem 1.2rem;
+  align-self: start;
+}
+.controls-title {
+  font-size: 0.78rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--amber-dark);
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.param {
+  margin-bottom: 1.3rem;
+}
+.param-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-mid);
+  margin-bottom: 0.55rem;
+}
+.param-num {
+  width: 1.3em;
+  height: 1.3em;
+  background: var(--amber);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.btn-opt {
+  padding: 0.38rem 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  line-height: 1.3;
+}
+.btn-opt:hover {
+  background: var(--parchment-mid);
+  border-color: var(--amber);
+}
+.btn-opt.active {
+  background: var(--amber);
+  border-color: var(--amber-dark);
+  color: white;
+}
+.param-hint {
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--ink-light);
+  font-style: italic;
+}
+
+/* ── Session tally ── */
+.tally {
+  background: var(--parchment-mid);
+  border: 1px solid var(--border-light);
+  padding: 0.8rem 1rem;
+  margin-top: 0.5rem;
+}
+.tally-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.86rem;
+  color: var(--ink-light);
+}
+.tally-row + .tally-row { margin-top: 0.25rem; }
+.tally-row .val {
+  font-weight: bold;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Results panel ── */
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* ── Chart ── */
+.chart-box {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 1.3rem 1.5rem 1rem;
+}
+.chart-box-title {
+  font-size: 0.82rem;
+  color: var(--ink-light);
+  font-style: italic;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.chart-layout {
+  display: flex;
+  align-items: stretch;
+  gap: 0.4rem;
+}
+.chart-y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 0.1rem;
+  height: 190px;
+  min-width: 42px;
+}
+.chart-y-axis span {
+  font-size: 0.7rem;
+  color: var(--ink-light);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chart-main {
+  flex: 1;
+}
+.chart-plot {
+  height: 190px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  border-left: 2px solid var(--ink-light);
+  border-bottom: 2px solid var(--ink-light);
+  position: relative;
+  padding: 0 1rem;
+}
+.gridline {
+  position: absolute;
+  left: 0; right: 0;
+  border-top: 1px dashed var(--border-light);
+  pointer-events: none;
+}
+.bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  min-width: 70px;
+  height: 100%;
+}
+.bar-val {
+  font-size: 0.78rem;
+  color: var(--ink-light);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.bar {
+  width: 52px;
+  transition: height 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.bar-blue { background: var(--blue-bar); }
+.bar-red  { background: var(--red-bar); }
+
+.chart-xlabels {
+  display: flex;
+  justify-content: space-around;
+  padding: 0.4rem 1rem 0;
+}
+.chart-xlabels span {
+  font-size: 0.78rem;
+  color: var(--ink-mid);
+  text-align: center;
+  min-width: 70px;
+}
+
+.chart-ylabel {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--ink-light);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ── P-value display ── */
+.pvalue-box {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.pvalue-main { text-align: center; flex: 0 0 auto; }
+.pvalue-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-light);
+  margin-bottom: 0.3rem;
+}
+.pvalue-number {
+  font-size: 2.4rem;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  transition: color 0.3s;
+  line-height: 1;
+}
+.pvalue-number.neutral { color: var(--ink-light); }
+.pvalue-number.sig     { color: var(--green-dark); }
+.pvalue-thresh {
+  font-size: 0.75rem;
+  color: var(--ink-light);
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+.pvalue-verdict { flex: 1; min-width: 180px; }
+.verdict-idle {
+  font-size: 0.86rem;
+  color: var(--ink-light);
+  font-style: italic;
+  padding: 0.6rem 0.9rem;
+  border: 1px dashed var(--border);
+  background: var(--parchment);
+}
+.verdict-sig {
+  font-size: 0.86rem;
+  color: var(--green-dark);
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--green-mid);
+  background: var(--green-bg);
+  line-height: 1.5;
+}
+.verdict-sig strong { display: block; font-size: 0.94rem; margin-bottom: 0.2rem; }
+
+/* ── Educational note ── */
+.edu-note {
+  background: var(--parchment-mid);
+  border: 1px solid var(--border-light);
+  padding: 1rem 1.3rem;
+  font-size: 0.84rem;
+  color: var(--ink-light);
+  line-height: 1.7;
+}
+.edu-note strong { color: var(--ink); }
+
+/* ── Footer ── */
+.site-footer {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--border);
+  padding-top: 0.9rem;
+  font-size: 0.78rem;
+  color: var(--ink-light);
+  font-style: italic;
+  line-height: 1.7;
+}
+
+/* ── Publication modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 19, 10, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal {
+  background: var(--parchment);
+  border: 2px solid var(--amber);
+  padding: 2.5rem 2.2rem 2rem;
+  max-width: 460px;
+  width: 90%;
+  text-align: center;
+  transform: translateY(-16px);
+  transition: transform 0.25s;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+
+.modal-stamp {
+  display: inline-block;
+  border: 2px solid var(--amber);
+  color: var(--amber-dark);
+  font-size: 0.74rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.7rem;
+  transform: rotate(-2deg);
+  margin-bottom: 1.1rem;
+}
+.modal h2 {
+  font-size: 1.22rem;
+  font-weight: normal;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+.modal-journal {
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--amber-dark);
+  margin-bottom: 1rem;
+}
+.modal-body {
+  font-size: 0.84rem;
+  color: var(--ink-light);
+  line-height: 1.7;
+  margin-bottom: 1.4rem;
+}
+.modal-body strong { color: var(--ink); }
+.modal-warning {
+  font-size: 0.78rem;
+  color: var(--ink-light);
+  font-style: italic;
+  border-top: 1px solid var(--border-light);
+  padding-top: 0.8rem;
+  margin-bottom: 1.2rem;
+  text-align: left;
+  line-height: 1.6;
+}
+.modal-btn {
+  padding: 0.55rem 1.6rem;
+  background: var(--amber);
+  color: white;
+  border: none;
+  font-family: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: background 0.12s;
+}
+.modal-btn:hover { background: var(--amber-dark); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>P-Hacking：凑出你的"发现"</h1>
+  <div class="tagline">调整分析参数，直到统计数字令你满意——亲身体验这件事有多容易</div>
+</header>
+
+<div class="container">
+
+  <!-- Hypothesis -->
+  <div class="hypothesis">
+    <div class="label">当前研究假设</div>
+    <div class="claim" id="hypothesis-text">"执政党 对 GDP 增速 有显著正向影响"</div>
+  </div>
+
+  <!-- Left: Controls -->
+  <div class="controls">
+    <div class="controls-title">分析参数设置</div>
+
+    <div class="param">
+      <div class="param-label">
+        <span class="param-num">1</span>自变量定义
+      </div>
+      <div class="btn-group" id="pg-indep">
+        <button class="btn-opt active" data-val="0">执政党</button>
+        <button class="btn-opt"        data-val="1">国会党派构成</button>
+      </div>
+      <div class="param-hint">用哪个维度代表"政治变量"？</div>
+    </div>
+
+    <div class="param">
+      <div class="param-label">
+        <span class="param-num">2</span>因变量定义
+      </div>
+      <div class="btn-group" id="pg-dep">
+        <button class="btn-opt active" data-val="0">GDP 增速</button>
+        <button class="btn-opt"        data-val="1">失业率</button>
+        <button class="btn-opt"        data-val="2">股市表现</button>
+      </div>
+      <div class="param-hint">怎样衡量"经济表现"？</div>
+    </div>
+
+    <div class="param">
+      <div class="param-label">
+        <span class="param-num">3</span>时间窗口
+      </div>
+      <div class="btn-group" id="pg-time">
+        <button class="btn-opt active" data-val="0">全部年份</button>
+        <button class="btn-opt"        data-val="1">剔除衰退期</button>
+      </div>
+      <div class="param-hint">哪些年份的数据算数？</div>
+    </div>
+
+    <div class="param">
+      <div class="param-label">
+        <span class="param-num">4</span>统计权重
+      </div>
+      <div class="btn-group" id="pg-weight">
+        <button class="btn-opt active" data-val="0">简单平均</button>
+        <button class="btn-opt"        data-val="1">加权计算</button>
+      </div>
+      <div class="param-hint">每个数据点的重要性相同吗？</div>
+    </div>
+
+    <div class="tally">
+      <div class="tally-row">
+        <span>已探索组合数</span>
+        <span class="val" id="tally-explored">1 / 24</span>
+      </div>
+      <div class="tally-row">
+        <span>成功"发表"次数</span>
+        <span class="val" id="tally-pubs">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Results -->
+  <div class="results">
+
+    <!-- Chart -->
+    <div class="chart-box">
+      <div class="chart-box-title" id="chart-title">不同执政党下的 GDP 增速均值比较</div>
+      <div class="chart-layout">
+        <div class="chart-y-axis" id="y-axis-ticks">
+          <!-- filled by JS -->
+        </div>
+        <div class="chart-main">
+          <div class="chart-plot" id="chart-plot">
+            <div class="gridline" style="bottom:75%"></div>
+            <div class="gridline" style="bottom:50%"></div>
+            <div class="gridline" style="bottom:25%"></div>
+            <div class="bar-col">
+              <div class="bar-val" id="val-a">2.1%</div>
+              <div class="bar bar-blue" id="bar-a" style="height:80px"></div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-val" id="val-b">2.4%</div>
+              <div class="bar bar-red" id="bar-b" style="height:91px"></div>
+            </div>
+          </div>
+          <div class="chart-xlabels">
+            <span id="label-a">蓝党执政</span>
+            <span id="label-b">红党执政</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-ylabel" id="chart-ylabel">GDP 增速均值 (%)</div>
+    </div>
+
+    <!-- P-value -->
+    <div class="pvalue-box">
+      <div class="pvalue-main">
+        <div class="pvalue-label">P 值</div>
+        <div class="pvalue-number neutral" id="pvalue-display">p = 0.342</div>
+        <div class="pvalue-thresh">临界值：p &lt; 0.05</div>
+      </div>
+      <div class="pvalue-verdict" id="verdict-area">
+        <div class="verdict-idle">
+          尚未达到统计显著性。<br>继续调整参数……
+        </div>
+      </div>
+    </div>
+
+    <!-- Educational note -->
+    <div class="edu-note">
+      <strong>你在做什么？</strong>
+      每次切换参数，你就在重新定义"研究设计"——谁被纳入样本、用哪个指标、哪段时间算数。
+      在真实学术实践中，研究者往往在看到数据 <em>之后</em> 才决定这些问题。
+      这就是 <strong>p-hacking</strong> 的本质：反复试探，直到 p 值跌破 0.05。
+      <br><br>
+      本游戏中共有 24 种参数组合——探索一下，找出其中几种"可发表"的。
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="site-footer">
+    <strong>注：</strong>
+    本游戏所用数据为合成数据（固定随机种子生成），不代表真实历史统计结论，也不对任何政党作出价值判断。
+    游戏旨在展示：当研究者拥有足够多的分析自由度时，在同一份数据中找到"统计显著"的结果往往并不困难。
+    预注册（pre-registration）——在看数据之前锁定分析方案——是避免 p-hacking 的重要工具之一。
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-stamp">已接受刊登</div>
+    <h2>您的论文已被学术期刊接受！</h2>
+    <div class="modal-journal" id="modal-journal">《经济研究季刊》</div>
+    <div class="modal-body" id="modal-body">
+      当前参数组合产生了 <strong>p = 0.041</strong>，通过了 0.05 显著性检验。<br>
+      这是您本次游戏的第 <strong>1</strong> 次成功"发表"。
+    </div>
+    <div class="modal-warning">
+      ⚠ 现实提示：这篇"论文"所用的分析参数，是在看了数据之后才选定的。
+      如果换一组参数，同一份数据可能得出完全不同的结论。
+      这就是 p-hacking 的问题所在。
+    </div>
+    <button class="modal-btn" id="modal-close">继续探索</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// Lookup table: 24 parameter combinations
+// Key: "${indep}_${dep}_${time}_${weight}"
+//   indep:  0=exec_party  1=congress
+//   dep:    0=gdp  1=unemployment  2=stocks
+//   time:   0=all  1=excl_recession
+//   weight: 0=simple  1=weighted
+//
+// aVal/bVal: group means (Blue / Red party condition)
+// unit: display suffix
+// ─────────────────────────────────────────────
+const DATA = {
+  // Executive party × GDP growth (unit: %)
+  "0_0_0_0": { p: 0.342, aVal: 2.1, bVal: 2.4 },
+  "0_0_0_1": { p: 0.189, aVal: 2.0, bVal: 2.6 },
+  "0_0_1_0": { p: 0.041, aVal: 1.8, bVal: 3.2 },
+  "0_0_1_1": { p: 0.023, aVal: 1.7, bVal: 3.5 },
+  // Executive party × Unemployment (unit: %)
+  "0_1_0_0": { p: 0.412, aVal: 5.8, bVal: 5.5 },
+  "0_1_0_1": { p: 0.267, aVal: 5.9, bVal: 5.4 },
+  "0_1_1_0": { p: 0.078, aVal: 5.2, bVal: 4.8 },
+  "0_1_1_1": { p: 0.065, aVal: 5.0, bVal: 4.7 },
+  // Executive party × Stock returns (unit: %)
+  "0_2_0_0": { p: 0.213, aVal: 7.2, bVal: 8.1 },
+  "0_2_0_1": { p: 0.098, aVal: 7.0, bVal: 8.5 },
+  "0_2_1_0": { p: 0.031, aVal: 6.8, bVal: 9.3 },
+  "0_2_1_1": { p: 0.012, aVal: 6.5, bVal: 9.8 },
+  // Congress × GDP growth
+  "1_0_0_0": { p: 0.554, aVal: 2.3, bVal: 2.2 },
+  "1_0_0_1": { p: 0.431, aVal: 2.2, bVal: 2.4 },
+  "1_0_1_0": { p: 0.124, aVal: 2.0, bVal: 2.7 },
+  "1_0_1_1": { p: 0.067, aVal: 1.9, bVal: 2.9 },
+  // Congress × Unemployment
+  "1_1_0_0": { p: 0.378, aVal: 5.6, bVal: 5.9 },
+  "1_1_0_1": { p: 0.243, aVal: 5.5, bVal: 6.0 },
+  "1_1_1_0": { p: 0.044, aVal: 4.8, bVal: 6.2 },
+  "1_1_1_1": { p: 0.019, aVal: 4.6, bVal: 6.5 },
+  // Congress × Stock returns
+  "1_2_0_0": { p: 0.163, aVal: 7.4, bVal: 8.3 },
+  "1_2_0_1": { p: 0.072, aVal: 7.1, bVal: 8.7 },
+  "1_2_1_0": { p: 0.028, aVal: 6.9, bVal: 9.5 },
+  "1_2_1_1": { p: 0.005, aVal: 6.7, bVal: 9.9 },
+};
+
+// Axis configuration per dependent variable
+const DEP_CONFIG = [
+  { label: "GDP 增速",    yLabel: "GDP 增速均值 (%)",    max: 5.0,  ticks: [0, 1, 2, 3, 4, 5] },
+  { label: "失业率",      yLabel: "失业率均值 (%)",       max: 8.0,  ticks: [0, 2, 4, 6, 8]    },
+  { label: "股市年回报率", yLabel: "股市年均回报率 (%)",  max: 12.0, ticks: [0, 3, 6, 9, 12]   },
+];
+const INDEP_LABELS = ["执政党", "国会党派构成"];
+const GROUP_A = ["蓝党执政", "蓝党国会多数"];
+const GROUP_B = ["红党执政", "红党国会多数"];
+const JOURNALS = [
+  "《经济研究季刊》",
+  "《政治经济学报》",
+  "《统计与政策评论》",
+  "《应用经济学期刊》",
+  "《宏观经济分析》",
+];
+
+// ─── State ───
+const state = { indep: 0, dep: 0, time: 0, weight: 0 };
+const explored = new Set();
+const published = new Set();
+let pubCount = 0;
+
+function key() {
+  return `${state.indep}_${state.dep}_${state.time}_${state.weight}`;
+}
+
+// ─── Chart heights ───
+const CHART_H = 160; // px of drawable area
+
+function renderChart(d) {
+  const cfg = DEP_CONFIG[state.dep];
+  const aH = Math.round((d.aVal / cfg.max) * CHART_H);
+  const bH = Math.round((d.bVal / cfg.max) * CHART_H);
+
+  document.getElementById("bar-a").style.height = aH + "px";
+  document.getElementById("bar-b").style.height = bH + "px";
+  document.getElementById("val-a").textContent = d.aVal.toFixed(1) + "%";
+  document.getElementById("val-b").textContent = d.bVal.toFixed(1) + "%";
+  document.getElementById("label-a").textContent = GROUP_A[state.indep];
+  document.getElementById("label-b").textContent = GROUP_B[state.indep];
+  document.getElementById("chart-ylabel").textContent = cfg.yLabel;
+  document.getElementById("chart-title").textContent =
+    `不同${INDEP_LABELS[state.indep]}下的${cfg.label}均值比较`;
+
+  // Y-axis tick marks
+  const yAxis = document.getElementById("y-axis-ticks");
+  yAxis.innerHTML = cfg.ticks.slice().reverse().map(t => `<span>${t}%</span>`).join("");
+}
+
+// ─── P-value display ───
+function renderPValue(d) {
+  const el = document.getElementById("pvalue-display");
+  const pStr = d.p < 0.001 ? "p < 0.001" : `p = ${d.p.toFixed(3)}`;
+  el.textContent = pStr;
+
+  const verdictEl = document.getElementById("verdict-area");
+
+  if (d.p < 0.05) {
+    el.className = "pvalue-number sig";
+    verdictEl.innerHTML = `<div class="verdict-sig">
+      <strong>★ 统计显著（p &lt; 0.05）</strong>
+      当前参数组合下，结果达到了传统发表标准。
+    </div>`;
+  } else {
+    el.className = "pvalue-number neutral";
+    verdictEl.innerHTML = `<div class="verdict-idle">尚未达到统计显著性。<br>继续调整参数……</div>`;
+  }
+}
+
+// ─── Main update ───
+function update() {
+  const k = key();
+  explored.add(k);
+  const d = DATA[k];
+
+  // Hypothesis
+  document.getElementById("hypothesis-text").textContent =
+    `"${INDEP_LABELS[state.indep]} 对 ${DEP_CONFIG[state.dep].label} 有显著正向影响"`;
+
+  renderChart(d);
+  renderPValue(d);
+
+  // Tally
+  document.getElementById("tally-explored").textContent =
+    `${explored.size} / 24`;
+
+  // Trigger modal for newly discovered significant combos
+  if (d.p < 0.05 && !published.has(k)) {
+    published.add(k);
+    setTimeout(() => showModal(d, k), 380);
+  }
+}
+
+// ─── Modal ───
+function showModal(d, k) {
+  pubCount++;
+  const journal = JOURNALS[(pubCount - 1) % JOURNALS.length];
+  const pStr = d.p < 0.001 ? "< 0.001" : d.p.toFixed(3);
+
+  document.getElementById("modal-journal").textContent = journal;
+  document.getElementById("modal-body").innerHTML =
+    `当前参数组合产生了 <strong>p = ${pStr}</strong>，通过了 0.05 显著性检验。<br>
+     这是您本次游戏的第 <strong>${pubCount}</strong> 次成功"发表"。`;
+
+  document.getElementById("tally-pubs").textContent = pubCount;
+  document.getElementById("modal-overlay").classList.add("open");
+}
+
+document.getElementById("modal-close").addEventListener("click", () => {
+  document.getElementById("modal-overlay").classList.remove("open");
+});
+document.getElementById("modal-overlay").addEventListener("click", (e) => {
+  if (e.target === document.getElementById("modal-overlay")) {
+    document.getElementById("modal-overlay").classList.remove("open");
+  }
+});
+
+// ─── Button groups ───
+function bindGroup(groupId, stateKey) {
+  document.getElementById(groupId).addEventListener("click", e => {
+    const btn = e.target.closest(".btn-opt");
+    if (!btn) return;
+    document.querySelectorAll(`#${groupId} .btn-opt`).forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    state[stateKey] = parseInt(btn.dataset.val, 10);
+    update();
+  });
+}
+
+bindGroup("pg-indep",  "indep");
+bindGroup("pg-dep",    "dep");
+bindGroup("pg-time",   "time");
+bindGroup("pg-weight", "weight");
+
+// Initial render
+update();
+</script>
+</body>
+</html>
