@@ -16,20 +16,21 @@
   --ink-light:      #5a4030;
   --amber:          #8b6914;
   --amber-dark:     #6b4f10;
-  --amber-light:    #c49a30;
   --border:         #c8b48a;
   --border-light:   #ddd0b0;
   --green-dark:     #1a5c2a;
   --green-mid:      #2d7a40;
   --green-bg:       #eaf3ec;
-  --blue-bar:       #4a6fa5;
-  --red-bar:        #a54a4a;
+  --blue:           #4a6fa5;
+  --blue-dark:      #2a4f85;
+  --red:            #a54a4a;
+  --red-dark:       #852a2a;
+  --gray:           #a09070;
 }
 
 html { font-size: 16px; }
-
 body {
-  font-family: Georgia, 'Times New Roman', 'Noto Serif SC', serif;
+  font-family: Georgia, 'Times New Roman', serif;
   background: var(--parchment);
   color: var(--ink);
   line-height: 1.65;
@@ -43,27 +44,16 @@ body {
   padding: 1.4rem 2rem 1.2rem;
   text-align: center;
 }
-.site-header h1 {
-  font-size: 1.75rem;
-  font-weight: normal;
-  letter-spacing: 0.04em;
-  color: var(--ink);
-}
-.site-header .tagline {
-  margin-top: 0.25rem;
-  font-size: 0.88rem;
-  color: var(--ink-light);
-  font-style: italic;
-}
+.site-header h1 { font-size: 1.75rem; font-weight: normal; letter-spacing: 0.04em; }
+.site-header .tagline { margin-top: 0.2rem; font-size: 0.88rem; color: var(--ink-light); font-style: italic; }
 
 /* ── Layout ── */
 .container {
-  max-width: 1080px;
+  max-width: 1120px;
   margin: 0 auto;
   padding: 1.8rem 1.5rem;
   display: grid;
-  grid-template-columns: 330px 1fr;
-  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 370px 1fr;
   gap: 1.4rem;
 }
 
@@ -76,373 +66,173 @@ body {
   padding: 0.9rem 1.4rem;
 }
 .hypothesis .label {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--amber-dark);
-  margin-bottom: 0.2rem;
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--amber-dark); margin-bottom: 0.2rem;
 }
-.hypothesis .claim {
-  font-size: 1.08rem;
-  font-style: italic;
-  color: var(--ink);
-}
+.hypothesis .claim { font-size: 1.08rem; font-style: italic; }
 
-/* ── Controls panel ── */
+/* ── Controls ── */
 .controls {
   background: white;
   border: 1px solid var(--border);
-  padding: 1.4rem 1.3rem 1.2rem;
+  padding: 1.3rem 1.3rem 1.1rem;
   align-self: start;
 }
 .controls-title {
-  font-size: 0.78rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--amber-dark);
-  border-bottom: 1px solid var(--border-light);
-  padding-bottom: 0.5rem;
-  margin-bottom: 1.2rem;
+  font-size: 0.75rem; font-weight: bold; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--amber-dark);
+  border-bottom: 1px solid var(--border-light); padding-bottom: 0.5rem; margin-bottom: 1.1rem;
 }
-
-.param {
-  margin-bottom: 1.3rem;
-}
+.param { margin-bottom: 1.25rem; }
 .param-label {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.82rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink-mid);
-  margin-bottom: 0.55rem;
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.8rem; font-weight: bold; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--ink-mid); margin-bottom: 0.5rem;
 }
 .param-num {
-  width: 1.3em;
-  height: 1.3em;
-  background: var(--amber);
-  color: white;
-  border-radius: 50%;
-  font-size: 0.72rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  width: 1.3em; height: 1.3em; background: var(--amber); color: white;
+  border-radius: 50%; font-size: 0.7rem; display: inline-flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
 }
-.btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
+.param-hint { margin-top: 0.38rem; font-size: 0.74rem; color: var(--ink-light); font-style: italic; }
+
+/* Buttons */
+.btn-group { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .btn-opt {
-  padding: 0.38rem 0.75rem;
-  border: 1px solid var(--border);
-  background: var(--parchment);
-  color: var(--ink);
-  font-family: inherit;
-  font-size: 0.84rem;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-  line-height: 1.3;
+  padding: 0.35rem 0.72rem; border: 1px solid var(--border);
+  background: var(--parchment); color: var(--ink); font-family: inherit;
+  font-size: 0.83rem; cursor: pointer; transition: background 0.1s, border-color 0.1s, color 0.1s;
 }
-.btn-opt:hover {
-  background: var(--parchment-mid);
-  border-color: var(--amber);
-}
-.btn-opt.active {
-  background: var(--amber);
-  border-color: var(--amber-dark);
-  color: white;
-}
-.param-hint {
-  margin-top: 0.4rem;
-  font-size: 0.75rem;
-  color: var(--ink-light);
-  font-style: italic;
-}
+.btn-opt:hover { background: var(--parchment-mid); border-color: var(--amber); }
+.btn-opt.active { background: var(--amber); border-color: var(--amber-dark); color: white; }
 
-/* ── Session tally ── */
+/* Number inputs */
+.input-row {
+  display: flex; align-items: center; gap: 0.5rem;
+  flex-wrap: wrap; margin-top: 0.45rem;
+}
+.input-row .row-label { font-size: 0.8rem; color: var(--ink-light); white-space: nowrap; }
+.num-input {
+  width: 4.8rem; padding: 0.28rem 0.45rem;
+  border: 1px solid var(--border); background: var(--parchment);
+  color: var(--ink); font-family: inherit; font-size: 0.83rem;
+  font-variant-numeric: tabular-nums;
+}
+.num-input:focus { outline: 1px solid var(--amber); }
+.num-input:disabled { opacity: 0.45; cursor: not-allowed; }
+.num-input.narrow { width: 3.4rem; }
+.input-hint { font-size: 0.72rem; color: var(--ink-light); font-style: italic; }
+
+/* Checkbox */
+.check-row { display: flex; align-items: center; gap: 0.45rem; margin-top: 0.45rem; }
+.check-row label { font-size: 0.82rem; color: var(--ink-mid); cursor: pointer; }
+.check-row input[type="checkbox"] { accent-color: var(--amber); cursor: pointer; width: 0.95rem; height: 0.95rem; }
+
+/* Tally */
 .tally {
-  background: var(--parchment-mid);
-  border: 1px solid var(--border-light);
-  padding: 0.8rem 1rem;
-  margin-top: 0.5rem;
+  background: var(--parchment-mid); border: 1px solid var(--border-light);
+  padding: 0.75rem 1rem; margin-top: 0.5rem;
 }
-.tally-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 0.86rem;
-  color: var(--ink-light);
-}
-.tally-row + .tally-row { margin-top: 0.25rem; }
-.tally-row .val {
-  font-weight: bold;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-}
+.tally-row { display: flex; justify-content: space-between; font-size: 0.84rem; color: var(--ink-light); }
+.tally-row + .tally-row { margin-top: 0.22rem; }
+.tally-row .val { font-weight: bold; color: var(--ink); font-variant-numeric: tabular-nums; }
 
-/* ── Results panel ── */
-.results {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
+/* ── Results ── */
+.results { display: flex; flex-direction: column; gap: 1.2rem; }
 
-/* ── Chart ── */
-.chart-box {
-  background: white;
-  border: 1px solid var(--border);
-  padding: 1.3rem 1.5rem 1rem;
-}
-.chart-box-title {
-  font-size: 0.82rem;
-  color: var(--ink-light);
-  font-style: italic;
-  margin-bottom: 1rem;
-  text-align: center;
-}
+/* Chart */
+.chart-box { background: white; border: 1px solid var(--border); padding: 1.2rem 1.3rem 0.9rem; }
+.chart-box-title { font-size: 0.8rem; color: var(--ink-light); font-style: italic; text-align: center; margin-bottom: 0.7rem; }
+#chart-svg { width: 100%; display: block; }
 
-.chart-layout {
-  display: flex;
-  align-items: stretch;
-  gap: 0.4rem;
+.chart-legend {
+  display: flex; justify-content: center; gap: 1.5rem;
+  font-size: 0.75rem; color: var(--ink-light); margin-top: 0.5rem;
 }
-.chart-y-axis {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding-bottom: 0.1rem;
-  height: 190px;
-  min-width: 42px;
-}
-.chart-y-axis span {
-  font-size: 0.7rem;
-  color: var(--ink-light);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
+.legend-item { display: flex; align-items: center; gap: 0.35rem; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+.legend-cross { width: 10px; height: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; color: var(--gray); }
 
-.chart-main {
-  flex: 1;
-}
-.chart-plot {
-  height: 190px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-around;
-  border-left: 2px solid var(--ink-light);
-  border-bottom: 2px solid var(--ink-light);
-  position: relative;
-  padding: 0 1rem;
-}
-.gridline {
-  position: absolute;
-  left: 0; right: 0;
-  border-top: 1px dashed var(--border-light);
-  pointer-events: none;
-}
-.bar-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 3px;
-  min-width: 70px;
-  height: 100%;
-}
-.bar-val {
-  font-size: 0.78rem;
-  color: var(--ink-light);
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-}
-.bar {
-  width: 52px;
-  transition: height 0.35s cubic-bezier(0.4,0,0.2,1);
-}
-.bar-blue { background: var(--blue-bar); }
-.bar-red  { background: var(--red-bar); }
-
-.chart-xlabels {
-  display: flex;
-  justify-content: space-around;
-  padding: 0.4rem 1rem 0;
-}
-.chart-xlabels span {
-  font-size: 0.78rem;
-  color: var(--ink-mid);
-  text-align: center;
-  min-width: 70px;
-}
-
-.chart-ylabel {
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
-  color: var(--ink-light);
-  text-align: center;
-  font-style: italic;
-}
-
-/* ── P-value display ── */
+/* P-value */
 .pvalue-box {
-  background: white;
-  border: 1px solid var(--border);
-  padding: 1.2rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+  background: white; border: 1px solid var(--border);
+  padding: 1.1rem 1.4rem;
+  display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
 }
 .pvalue-main { text-align: center; flex: 0 0 auto; }
-.pvalue-label {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--ink-light);
-  margin-bottom: 0.3rem;
-}
+.pvalue-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-light); margin-bottom: 0.25rem; }
 .pvalue-number {
-  font-size: 2.4rem;
-  font-weight: bold;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  transition: color 0.3s;
-  line-height: 1;
+  font-size: 2.4rem; font-weight: bold; font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em; transition: color 0.3s; line-height: 1;
 }
 .pvalue-number.neutral { color: var(--ink-light); }
 .pvalue-number.sig     { color: var(--green-dark); }
-.pvalue-thresh {
-  font-size: 0.75rem;
-  color: var(--ink-light);
-  font-style: italic;
-  margin-top: 0.25rem;
-}
-.pvalue-verdict { flex: 1; min-width: 180px; }
-.verdict-idle {
-  font-size: 0.86rem;
-  color: var(--ink-light);
-  font-style: italic;
-  padding: 0.6rem 0.9rem;
-  border: 1px dashed var(--border);
-  background: var(--parchment);
-}
-.verdict-sig {
-  font-size: 0.86rem;
-  color: var(--green-dark);
-  padding: 0.6rem 0.9rem;
-  border: 1px solid var(--green-mid);
-  background: var(--green-bg);
-  line-height: 1.5;
-}
-.verdict-sig strong { display: block; font-size: 0.94rem; margin-bottom: 0.2rem; }
+.pvalue-number.err     { color: var(--red); font-size: 1.2rem; line-height: 2.4rem; }
+.pvalue-thresh { font-size: 0.73rem; color: var(--ink-light); font-style: italic; margin-top: 0.2rem; }
+.pvalue-side { flex: 1; min-width: 180px; }
 
-/* ── Educational note ── */
+.verdict-box {
+  font-size: 0.85rem; padding: 0.6rem 0.9rem; line-height: 1.55;
+}
+.verdict-box.idle { color: var(--ink-light); font-style: italic; border: 1px dashed var(--border); background: var(--parchment); }
+.verdict-box.sig  { color: var(--green-dark); border: 1px solid var(--green-mid); background: var(--green-bg); }
+.verdict-box.sig strong { display: block; font-size: 0.92rem; margin-bottom: 0.15rem; }
+
+/* Stats summary */
+.stats-summary {
+  background: var(--parchment-mid); border: 1px solid var(--border-light);
+  padding: 0.8rem 1.1rem; font-size: 0.82rem; color: var(--ink-light);
+  display: flex; gap: 2rem; flex-wrap: wrap;
+}
+.stat-group { flex: 1; min-width: 120px; }
+.stat-group-title { font-weight: bold; color: var(--ink-mid); margin-bottom: 0.2rem; font-size: 0.78rem; }
+.stat-line { font-variant-numeric: tabular-nums; }
+
+/* Edu note */
 .edu-note {
-  background: var(--parchment-mid);
-  border: 1px solid var(--border-light);
-  padding: 1rem 1.3rem;
-  font-size: 0.84rem;
-  color: var(--ink-light);
-  line-height: 1.7;
+  background: var(--parchment-mid); border: 1px solid var(--border-light);
+  padding: 1rem 1.2rem; font-size: 0.83rem; color: var(--ink-light); line-height: 1.7;
 }
 .edu-note strong { color: var(--ink); }
 
-/* ── Footer ── */
+/* Footer */
 .site-footer {
-  grid-column: 1 / -1;
-  border-top: 1px solid var(--border);
-  padding-top: 0.9rem;
-  font-size: 0.78rem;
-  color: var(--ink-light);
-  font-style: italic;
-  line-height: 1.7;
+  grid-column: 1 / -1; border-top: 1px solid var(--border);
+  padding-top: 0.85rem; font-size: 0.77rem; color: var(--ink-light);
+  font-style: italic; line-height: 1.7;
 }
 
-/* ── Publication modal ── */
+/* ── Modal ── */
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(30, 19, 10, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s;
+  position: fixed; inset: 0; background: rgba(30,19,10,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.25s;
 }
-.modal-overlay.open {
-  opacity: 1;
-  pointer-events: auto;
-}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
 .modal {
-  background: var(--parchment);
-  border: 2px solid var(--amber);
-  padding: 2.5rem 2.2rem 2rem;
-  max-width: 460px;
-  width: 90%;
-  text-align: center;
-  transform: translateY(-16px);
-  transition: transform 0.25s;
+  background: var(--parchment); border: 2px solid var(--amber);
+  padding: 2.4rem 2.1rem 1.9rem; max-width: 460px; width: 90%;
+  text-align: center; transform: translateY(-16px); transition: transform 0.25s;
 }
 .modal-overlay.open .modal { transform: translateY(0); }
-
 .modal-stamp {
-  display: inline-block;
-  border: 2px solid var(--amber);
-  color: var(--amber-dark);
-  font-size: 0.74rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  padding: 0.2rem 0.7rem;
-  transform: rotate(-2deg);
-  margin-bottom: 1.1rem;
+  display: inline-block; border: 2px solid var(--amber); color: var(--amber-dark);
+  font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 0.2rem 0.7rem; transform: rotate(-2deg); margin-bottom: 1rem;
 }
-.modal h2 {
-  font-size: 1.22rem;
-  font-weight: normal;
-  color: var(--ink);
-  margin-bottom: 0.4rem;
-}
-.modal-journal {
-  font-size: 1.05rem;
-  font-style: italic;
-  color: var(--amber-dark);
-  margin-bottom: 1rem;
-}
-.modal-body {
-  font-size: 0.84rem;
-  color: var(--ink-light);
-  line-height: 1.7;
-  margin-bottom: 1.4rem;
-}
+.modal h2 { font-size: 1.2rem; font-weight: normal; color: var(--ink); margin-bottom: 0.4rem; }
+.modal-journal { font-size: 1.03rem; font-style: italic; color: var(--amber-dark); margin-bottom: 0.9rem; }
+.modal-body { font-size: 0.83rem; color: var(--ink-light); line-height: 1.7; margin-bottom: 1.2rem; }
 .modal-body strong { color: var(--ink); }
 .modal-warning {
-  font-size: 0.78rem;
-  color: var(--ink-light);
-  font-style: italic;
-  border-top: 1px solid var(--border-light);
-  padding-top: 0.8rem;
-  margin-bottom: 1.2rem;
-  text-align: left;
-  line-height: 1.6;
+  font-size: 0.77rem; color: var(--ink-light); font-style: italic;
+  border-top: 1px solid var(--border-light); padding-top: 0.75rem;
+  margin-bottom: 1.1rem; text-align: left; line-height: 1.6;
 }
 .modal-btn {
-  padding: 0.55rem 1.6rem;
-  background: var(--amber);
-  color: white;
-  border: none;
-  font-family: inherit;
-  font-size: 0.88rem;
-  cursor: pointer;
-  letter-spacing: 0.04em;
-  transition: background 0.12s;
+  padding: 0.52rem 1.5rem; background: var(--amber); color: white; border: none;
+  font-family: inherit; font-size: 0.87rem; cursor: pointer; transition: background 0.12s;
 }
 .modal-btn:hover { background: var(--amber-dark); }
 </style>
@@ -451,142 +241,151 @@ body {
 
 <header class="site-header">
   <h1>P-Hacking：凑出你的"发现"</h1>
-  <div class="tagline">调整分析参数，直到统计数字令你满意——亲身体验这件事有多容易</div>
+  <div class="tagline">自由调整每一个分析参数，亲手体验"显著性"有多容易凑出来</div>
 </header>
 
 <div class="container">
 
-  <!-- Hypothesis -->
   <div class="hypothesis">
     <div class="label">当前研究假设</div>
-    <div class="claim" id="hypothesis-text">"执政党 对 GDP 增速 有显著正向影响"</div>
+    <div class="claim" id="hypothesis-text">"执政党 对 GDP 增速 有显著影响"</div>
   </div>
 
-  <!-- Left: Controls -->
+  <!-- ── Controls ── -->
   <div class="controls">
     <div class="controls-title">分析参数设置</div>
 
+    <!-- 1. Independent variable -->
     <div class="param">
-      <div class="param-label">
-        <span class="param-num">1</span>自变量定义
-      </div>
+      <div class="param-label"><span class="param-num">1</span>自变量定义</div>
       <div class="btn-group" id="pg-indep">
-        <button class="btn-opt active" data-val="0">执政党</button>
-        <button class="btn-opt"        data-val="1">国会党派构成</button>
+        <button class="btn-opt active" data-val="exec">执政党</button>
+        <button class="btn-opt"        data-val="cong">国会党派构成</button>
       </div>
       <div class="param-hint">用哪个维度代表"政治变量"？</div>
     </div>
 
+    <!-- 2. Dependent variable + lag -->
     <div class="param">
-      <div class="param-label">
-        <span class="param-num">2</span>因变量定义
-      </div>
+      <div class="param-label"><span class="param-num">2</span>因变量定义</div>
       <div class="btn-group" id="pg-dep">
-        <button class="btn-opt active" data-val="0">GDP 增速</button>
-        <button class="btn-opt"        data-val="1">失业率</button>
-        <button class="btn-opt"        data-val="2">股市表现</button>
+        <button class="btn-opt active" data-val="gdp">GDP 增速</button>
+        <button class="btn-opt"        data-val="unemp">失业率</button>
+        <button class="btn-opt"        data-val="stocks">股市表现</button>
       </div>
-      <div class="param-hint">怎样衡量"经济表现"？</div>
+      <div class="input-row" style="margin-top:0.5rem">
+        <span class="row-label">政策滞后年数</span>
+        <input type="number" id="inp-lag" class="num-input narrow" min="0" max="5" value="0">
+        <span class="input-hint">年（0 = 当年效果）</span>
+      </div>
+      <div class="param-hint">滞后 1 年意味着：用今年的执政党，匹配明年的经济数据</div>
     </div>
 
+    <!-- 3. Time window -->
     <div class="param">
-      <div class="param-label">
-        <span class="param-num">3</span>时间窗口
+      <div class="param-label"><span class="param-num">3</span>时间窗口</div>
+      <div class="input-row">
+        <span class="row-label">分析年份</span>
+        <input type="number" id="inp-year-start" class="num-input" min="1948" max="2019" value="1948">
+        <span class="row-label">至</span>
+        <input type="number" id="inp-year-end"   class="num-input" min="1949" max="2020" value="2020">
+        <span class="input-hint" id="year-count-hint">（73 年）</span>
       </div>
-      <div class="btn-group" id="pg-time">
-        <button class="btn-opt active" data-val="0">全部年份</button>
-        <button class="btn-opt"        data-val="1">剔除衰退期</button>
+      <div class="check-row">
+        <input type="checkbox" id="chk-rec">
+        <label for="chk-rec">剔除经济衰退年份</label>
       </div>
       <div class="param-hint">哪些年份的数据算数？</div>
     </div>
 
+    <!-- 4. Weight + outlier exclusion -->
     <div class="param">
-      <div class="param-label">
-        <span class="param-num">4</span>统计权重
-      </div>
+      <div class="param-label"><span class="param-num">4</span>统计方法</div>
       <div class="btn-group" id="pg-weight">
-        <button class="btn-opt active" data-val="0">简单平均</button>
-        <button class="btn-opt"        data-val="1">加权计算</button>
+        <button class="btn-opt active" data-val="simple">简单平均</button>
+        <button class="btn-opt"        data-val="recent">近年加权</button>
       </div>
-      <div class="param-hint">每个数据点的重要性相同吗？</div>
+      <div class="check-row" style="margin-top:0.5rem">
+        <input type="checkbox" id="chk-outlier">
+        <label for="chk-outlier">排除极端值（±</label>
+        <input type="number" id="inp-outlier-sd" class="num-input narrow" min="1" max="5" step="0.5" value="2.0" disabled>
+        <label for="chk-outlier"> 倍标准差之外）</label>
+      </div>
+      <div class="param-hint">每个数据点的重要性相同吗？离群值是噪音还是信息？</div>
     </div>
 
     <div class="tally">
       <div class="tally-row">
-        <span>已探索组合数</span>
-        <span class="val" id="tally-explored">1 / 24</span>
-      </div>
-      <div class="tally-row">
         <span>成功"发表"次数</span>
         <span class="val" id="tally-pubs">0</span>
+      </div>
+      <div class="tally-row">
+        <span>当前有效样本量</span>
+        <span class="val" id="tally-n">— / —</span>
       </div>
     </div>
   </div>
 
-  <!-- Right: Results -->
+  <!-- ── Results ── -->
   <div class="results">
 
-    <!-- Chart -->
+    <!-- Scatter chart -->
     <div class="chart-box">
-      <div class="chart-box-title" id="chart-title">不同执政党下的 GDP 增速均值比较</div>
-      <div class="chart-layout">
-        <div class="chart-y-axis" id="y-axis-ticks">
-          <!-- filled by JS -->
-        </div>
-        <div class="chart-main">
-          <div class="chart-plot" id="chart-plot">
-            <div class="gridline" style="bottom:75%"></div>
-            <div class="gridline" style="bottom:50%"></div>
-            <div class="gridline" style="bottom:25%"></div>
-            <div class="bar-col">
-              <div class="bar-val" id="val-a">2.1%</div>
-              <div class="bar bar-blue" id="bar-a" style="height:80px"></div>
-            </div>
-            <div class="bar-col">
-              <div class="bar-val" id="val-b">2.4%</div>
-              <div class="bar bar-red" id="bar-b" style="height:91px"></div>
-            </div>
-          </div>
-          <div class="chart-xlabels">
-            <span id="label-a">蓝党执政</span>
-            <span id="label-b">红党执政</span>
-          </div>
-        </div>
+      <div class="chart-box-title" id="chart-title">各年度数据：执政党 × GDP 增速</div>
+      <svg id="chart-svg" viewBox="0 0 620 230" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#4a6fa5"></div>蓝党</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#a54a4a"></div>红党</div>
+        <div class="legend-item"><div class="legend-cross">✕</div>已排除年份</div>
       </div>
-      <div class="chart-ylabel" id="chart-ylabel">GDP 增速均值 (%)</div>
     </div>
 
-    <!-- P-value -->
+    <!-- P-value display -->
     <div class="pvalue-box">
       <div class="pvalue-main">
-        <div class="pvalue-label">P 值</div>
-        <div class="pvalue-number neutral" id="pvalue-display">p = 0.342</div>
-        <div class="pvalue-thresh">临界值：p &lt; 0.05</div>
+        <div class="pvalue-label">P 值（Welch's t 检验）</div>
+        <div class="pvalue-number neutral" id="pvalue-display">—</div>
+        <div class="pvalue-thresh">显著性阈值：p &lt; 0.05</div>
       </div>
-      <div class="pvalue-verdict" id="verdict-area">
-        <div class="verdict-idle">
-          尚未达到统计显著性。<br>继续调整参数……
+      <div class="pvalue-side">
+        <div class="verdict-box idle" id="verdict-box">
+          调整左侧参数，观察 p 值如何变化……
         </div>
+      </div>
+    </div>
+
+    <!-- Group stats summary -->
+    <div class="stats-summary" id="stats-summary">
+      <div class="stat-group">
+        <div class="stat-group-title" style="color:#4a6fa5">蓝党时期</div>
+        <div class="stat-line" id="stat-blue">—</div>
+      </div>
+      <div class="stat-group">
+        <div class="stat-group-title" style="color:#a54a4a">红党时期</div>
+        <div class="stat-line" id="stat-red">—</div>
+      </div>
+      <div class="stat-group">
+        <div class="stat-group-title">组间差异</div>
+        <div class="stat-line" id="stat-diff">—</div>
       </div>
     </div>
 
     <!-- Educational note -->
     <div class="edu-note">
       <strong>你在做什么？</strong>
-      每次切换参数，你就在重新定义"研究设计"——谁被纳入样本、用哪个指标、哪段时间算数。
-      在真实学术实践中，研究者往往在看到数据 <em>之后</em> 才决定这些问题。
-      这就是 <strong>p-hacking</strong> 的本质：反复试探，直到 p 值跌破 0.05。
-      <br><br>
-      本游戏中共有 24 种参数组合——探索一下，找出其中几种"可发表"的。
+      每次改变参数，你就在重新定义"研究设计"——哪段历史算数、衰退是否剔除、政策需要多久才能显现、
+      是否用不同的统计权重。在真实学术研究中，这些决策往往在看到数据之后才做出。
+      这就是 <strong>p-hacking</strong>：反复调整，直到 p &lt; 0.05。<br><br>
+      注意：现在参数是连续可调的——年份范围、滞后年数、异常值阈值——
+      研究者的"自由度"远不止几个按钮选项。
     </div>
   </div>
 
-  <!-- Footer -->
   <div class="site-footer">
-    <strong>注：</strong>
-    本游戏所用数据为合成数据（固定随机种子生成），不代表真实历史统计结论，也不对任何政党作出价值判断。
-    游戏旨在展示：当研究者拥有足够多的分析自由度时，在同一份数据中找到"统计显著"的结果往往并不困难。
-    预注册（pre-registration）——在看数据之前锁定分析方案——是避免 p-hacking 的重要工具之一。
+    <strong>注：</strong>本游戏数据为合成数据（固定随机种子生成，参考真实历史分期但不代表任何真实结论），
+    政党以"蓝/红"虚构表示，不对任何现实政党作出价值判断。
+    p 值由 Welch's t 检验实时计算，图中每个点代表一个年度观测值。
+    预注册（pre-registration）是防止 p-hacking 的核心工具——在看数据之前锁定分析方案。
   </div>
 </div>
 
@@ -596,198 +395,502 @@ body {
     <div class="modal-stamp">已接受刊登</div>
     <h2>您的论文已被学术期刊接受！</h2>
     <div class="modal-journal" id="modal-journal">《经济研究季刊》</div>
-    <div class="modal-body" id="modal-body">
-      当前参数组合产生了 <strong>p = 0.041</strong>，通过了 0.05 显著性检验。<br>
-      这是您本次游戏的第 <strong>1</strong> 次成功"发表"。
-    </div>
+    <div class="modal-body" id="modal-body"></div>
     <div class="modal-warning">
-      ⚠ 现实提示：这篇"论文"所用的分析参数，是在看了数据之后才选定的。
-      如果换一组参数，同一份数据可能得出完全不同的结论。
-      这就是 p-hacking 的问题所在。
+      ⚠ 现实提示：以上参数组合是在观察数据之后选定的。
+      换一组参数，同一份数据可能给出截然相反的结论——这正是 p-hacking 危险所在。
     </div>
     <button class="modal-btn" id="modal-close">继续探索</button>
   </div>
 </div>
 
 <script>
-// ─────────────────────────────────────────────
-// Lookup table: 24 parameter combinations
-// Key: "${indep}_${dep}_${time}_${weight}"
-//   indep:  0=exec_party  1=congress
-//   dep:    0=gdp  1=unemployment  2=stocks
-//   time:   0=all  1=excl_recession
-//   weight: 0=simple  1=weighted
-//
-// aVal/bVal: group means (Blue / Red party condition)
-// unit: display suffix
-// ─────────────────────────────────────────────
-const DATA = {
-  // Executive party × GDP growth (unit: %)
-  "0_0_0_0": { p: 0.342, aVal: 2.1, bVal: 2.4 },
-  "0_0_0_1": { p: 0.189, aVal: 2.0, bVal: 2.6 },
-  "0_0_1_0": { p: 0.041, aVal: 1.8, bVal: 3.2 },
-  "0_0_1_1": { p: 0.023, aVal: 1.7, bVal: 3.5 },
-  // Executive party × Unemployment (unit: %)
-  "0_1_0_0": { p: 0.412, aVal: 5.8, bVal: 5.5 },
-  "0_1_0_1": { p: 0.267, aVal: 5.9, bVal: 5.4 },
-  "0_1_1_0": { p: 0.078, aVal: 5.2, bVal: 4.8 },
-  "0_1_1_1": { p: 0.065, aVal: 5.0, bVal: 4.7 },
-  // Executive party × Stock returns (unit: %)
-  "0_2_0_0": { p: 0.213, aVal: 7.2, bVal: 8.1 },
-  "0_2_0_1": { p: 0.098, aVal: 7.0, bVal: 8.5 },
-  "0_2_1_0": { p: 0.031, aVal: 6.8, bVal: 9.3 },
-  "0_2_1_1": { p: 0.012, aVal: 6.5, bVal: 9.8 },
-  // Congress × GDP growth
-  "1_0_0_0": { p: 0.554, aVal: 2.3, bVal: 2.2 },
-  "1_0_0_1": { p: 0.431, aVal: 2.2, bVal: 2.4 },
-  "1_0_1_0": { p: 0.124, aVal: 2.0, bVal: 2.7 },
-  "1_0_1_1": { p: 0.067, aVal: 1.9, bVal: 2.9 },
-  // Congress × Unemployment
-  "1_1_0_0": { p: 0.378, aVal: 5.6, bVal: 5.9 },
-  "1_1_0_1": { p: 0.243, aVal: 5.5, bVal: 6.0 },
-  "1_1_1_0": { p: 0.044, aVal: 4.8, bVal: 6.2 },
-  "1_1_1_1": { p: 0.019, aVal: 4.6, bVal: 6.5 },
-  // Congress × Stock returns
-  "1_2_0_0": { p: 0.163, aVal: 7.4, bVal: 8.3 },
-  "1_2_0_1": { p: 0.072, aVal: 7.1, bVal: 8.7 },
-  "1_2_1_0": { p: 0.028, aVal: 6.9, bVal: 9.5 },
-  "1_2_1_1": { p: 0.005, aVal: 6.7, bVal: 9.9 },
+// ═══════════════════════════════════════════════════════════
+//  1. Seeded PRNG (mulberry32)
+// ═══════════════════════════════════════════════════════════
+function mulberry32(seed) {
+  return () => {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function boxMuller(rng) {
+  const u = Math.max(1e-12, rng()), v = rng();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  2. Political history (fictional Blue / Red, loosely
+//     inspired by post-war US political cycles)
+// ═══════════════════════════════════════════════════════════
+function execParty(yr) {
+  // Blue executive: 1948-52, 1961-68, 1977-80, 1993-2000, 2009-16
+  if (yr <= 1952) return 'B';
+  if (yr <= 1960) return 'R';
+  if (yr <= 1968) return 'B';
+  if (yr <= 1976) return 'R';
+  if (yr <= 1980) return 'B';
+  if (yr <= 1992) return 'R';
+  if (yr <= 2000) return 'B';
+  if (yr <= 2008) return 'R';
+  if (yr <= 2016) return 'B';
+  return 'R';
+}
+
+function congParty(yr) {
+  // Blue congress: 1948-52, 1955-80, 1987-94, 2007-10, 2019-20
+  if (yr <= 1946) return 'B';
+  if (yr <= 1948) return 'R';
+  if (yr <= 1952) return 'B';
+  if (yr <= 1954) return 'R';
+  if (yr <= 1980) return 'B';
+  if (yr <= 1986) return 'R';
+  if (yr <= 1994) return 'B';
+  if (yr <= 2006) return 'R';
+  if (yr <= 2010) return 'B';
+  if (yr <= 2018) return 'R';
+  return 'B';
+}
+
+const RECESSION_SET = new Set([
+  1949, 1954, 1958, 1960, 1961,
+  1970, 1974, 1975, 1980, 1982,
+  1991, 2001, 2008, 2009, 2020
+]);
+
+// ═══════════════════════════════════════════════════════════
+//  3. Synthetic dataset  (1948 – 2020, fixed seed)
+// ═══════════════════════════════════════════════════════════
+function generateDataset() {
+  const rng = mulberry32(271828);
+  const rows = [];
+  for (let yr = 1948; yr <= 2020; yr++) {
+    const ep = execParty(yr);
+    const cp = congParty(yr);
+    const rec = RECESSION_SET.has(yr);
+
+    const gdp = 2.6
+      + (ep === 'B' ?  0.25 : -0.25)
+      + (rec        ? -4.8  :  0)
+      + boxMuller(rng) * 1.75;
+
+    const unempBase = 5.5 + Math.sin((yr - 1965) * 0.22) * 0.9;
+    const unemp = Math.max(2.5, unempBase
+      + (ep === 'B' ? -0.22 :  0.22)
+      + (rec        ?  2.0  :  0)
+      + boxMuller(rng) * 0.72);
+
+    const stocks = 8.5
+      + (ep === 'B' ?  2.2 : -2.2)
+      + (rec        ? -22  :  0)
+      + boxMuller(rng) * 14;
+
+    rows.push({
+      yr, ep, cp, rec,
+      gdp:    +gdp.toFixed(2),
+      unemp:  +unemp.toFixed(2),
+      stocks: +stocks.toFixed(2),
+    });
+  }
+  return rows;
+}
+
+const DATASET = generateDataset();
+
+// ═══════════════════════════════════════════════════════════
+//  4. State
+// ═══════════════════════════════════════════════════════════
+const state = {
+  indep:      'exec',
+  dep:        'gdp',
+  lag:        0,
+  yearStart:  1948,
+  yearEnd:    2020,
+  exclRec:    false,
+  weight:     'simple',
+  exclOut:    false,
+  outlierSD:  2.0,
 };
 
-// Axis configuration per dependent variable
-const DEP_CONFIG = [
-  { label: "GDP 增速",    yLabel: "GDP 增速均值 (%)",    max: 5.0,  ticks: [0, 1, 2, 3, 4, 5] },
-  { label: "失业率",      yLabel: "失业率均值 (%)",       max: 8.0,  ticks: [0, 2, 4, 6, 8]    },
-  { label: "股市年回报率", yLabel: "股市年均回报率 (%)",  max: 12.0, ticks: [0, 3, 6, 9, 12]   },
-];
-const INDEP_LABELS = ["执政党", "国会党派构成"];
-const GROUP_A = ["蓝党执政", "蓝党国会多数"];
-const GROUP_B = ["红党执政", "红党国会多数"];
-const JOURNALS = [
-  "《经济研究季刊》",
-  "《政治经济学报》",
-  "《统计与政策评论》",
-  "《应用经济学期刊》",
-  "《宏观经济分析》",
-];
+let pubCount  = 0;
+let prevSig   = false;
 
-// ─── State ───
-const state = { indep: 0, dep: 0, time: 0, weight: 0 };
-const explored = new Set();
-const published = new Set();
-let pubCount = 0;
+// ═══════════════════════════════════════════════════════════
+//  5. Data filtering
+// ═══════════════════════════════════════════════════════════
+function getFilteredRows() {
+  // Base window
+  let rows = DATASET.filter(d => d.yr >= state.yearStart && d.yr <= state.yearEnd);
 
-function key() {
-  return `${state.indep}_${state.dep}_${state.time}_${state.weight}`;
+  // Policy lag: associate political year with economy lag years later
+  if (state.lag > 0) {
+    rows = rows.map(d => {
+      const econRow = DATASET.find(e => e.yr === d.yr + state.lag);
+      if (!econRow) return null;
+      return { ...d, gdp: econRow.gdp, unemp: econRow.unemp, stocks: econRow.stocks };
+    }).filter(Boolean);
+  }
+
+  // Exclude recessions (using the original year's recession flag)
+  if (state.exclRec) rows = rows.filter(d => !d.rec);
+
+  return rows;
 }
 
-// ─── Chart heights ───
-const CHART_H = 160; // px of drawable area
-
-function renderChart(d) {
-  const cfg = DEP_CONFIG[state.dep];
-  const aH = Math.round((d.aVal / cfg.max) * CHART_H);
-  const bH = Math.round((d.bVal / cfg.max) * CHART_H);
-
-  document.getElementById("bar-a").style.height = aH + "px";
-  document.getElementById("bar-b").style.height = bH + "px";
-  document.getElementById("val-a").textContent = d.aVal.toFixed(1) + "%";
-  document.getElementById("val-b").textContent = d.bVal.toFixed(1) + "%";
-  document.getElementById("label-a").textContent = GROUP_A[state.indep];
-  document.getElementById("label-b").textContent = GROUP_B[state.indep];
-  document.getElementById("chart-ylabel").textContent = cfg.yLabel;
-  document.getElementById("chart-title").textContent =
-    `不同${INDEP_LABELS[state.indep]}下的${cfg.label}均值比较`;
-
-  // Y-axis tick marks
-  const yAxis = document.getElementById("y-axis-ticks");
-  yAxis.innerHTML = cfg.ticks.slice().reverse().map(t => `<span>${t}%</span>`).join("");
+function getWeight(yr) {
+  return state.weight === 'recent' ? Math.pow(1.045, yr - 1948) : 1;
 }
 
-// ─── P-value display ───
-function renderPValue(d) {
-  const el = document.getElementById("pvalue-display");
-  const pStr = d.p < 0.001 ? "p < 0.001" : `p = ${d.p.toFixed(3)}`;
-  el.textContent = pStr;
+// ═══════════════════════════════════════════════════════════
+//  6. Welch's t-test with p-value
+// ═══════════════════════════════════════════════════════════
+function wStats(pts) {
+  if (pts.length < 2) return null;
+  const W = pts.reduce((s, p) => s + p.w, 0);
+  const W2 = pts.reduce((s, p) => s + p.w * p.w, 0);
+  const mean = pts.reduce((s, p) => s + p.y * p.w, 0) / W;
+  const varBiased = pts.reduce((s, p) => s + p.w * (p.y - mean) ** 2, 0) / W;
+  const variance = varBiased * W / (W - W2 / W); // reliability-weighted Bessel correction
+  return { mean, variance, n: pts.length, W };
+}
 
-  const verdictEl = document.getElementById("verdict-area");
+// log-gamma (Lanczos g=5)
+function lgamma(x) {
+  const c = [76.18009172947146,-86.50532032941677,24.01409824083091,
+             -1.231739572450155,1.208650973866179e-3,-5.395239384953e-6];
+  let y = x, tmp = x + 5.5 - (x + 0.5) * Math.log(x + 5.5);
+  let ser = 1.000000000190015;
+  for (let j = 0; j < 6; j++) ser += c[j] / ++y;
+  return -tmp + Math.log(2.5066282746310005 * ser / x);
+}
 
-  if (d.p < 0.05) {
-    el.className = "pvalue-number sig";
-    verdictEl.innerHTML = `<div class="verdict-sig">
-      <strong>★ 统计显著（p &lt; 0.05）</strong>
-      当前参数组合下，结果达到了传统发表标准。
-    </div>`;
-  } else {
-    el.className = "pvalue-number neutral";
-    verdictEl.innerHTML = `<div class="verdict-idle">尚未达到统计显著性。<br>继续调整参数……</div>`;
+// Regularised incomplete beta via Lentz continued fraction
+function betacf(x, a, b) {
+  const MAXIT = 200, EPS = 3e-7, FPMIN = 1e-30;
+  const qab = a+b, qap = a+1, qam = a-1;
+  let c = 1, d = 1 - qab*x/qap;
+  if (Math.abs(d) < FPMIN) d = FPMIN;
+  d = 1/d; let h = d;
+  for (let m = 1; m <= MAXIT; m++) {
+    const m2 = 2*m;
+    let aa = m*(b-m)*x / ((qam+m2)*(a+m2));
+    d = 1+aa*d; if (Math.abs(d)<FPMIN) d=FPMIN;
+    c = 1+aa/c; if (Math.abs(c)<FPMIN) c=FPMIN;
+    d = 1/d; h *= d*c;
+    aa = -(a+m)*(qab+m)*x / ((a+m2)*(qap+m2));
+    d = 1+aa*d; if (Math.abs(d)<FPMIN) d=FPMIN;
+    c = 1+aa/c; if (Math.abs(c)<FPMIN) c=FPMIN;
+    d = 1/d; const del = d*c; h *= del;
+    if (Math.abs(del-1) < EPS) break;
+  }
+  return h;
+}
+
+function ibeta(x, a, b) {
+  if (x <= 0) return 0; if (x >= 1) return 1;
+  const bt = Math.exp(lgamma(a+b) - lgamma(a) - lgamma(b) + a*Math.log(x) + b*Math.log(1-x));
+  return x < (a+1)/(a+b+2) ? bt*betacf(x,a,b)/a : 1 - bt*betacf(1-x,b,a)/b;
+}
+
+function welchTest(grpA, grpB) {
+  const sA = wStats(grpA), sB = wStats(grpB);
+  if (!sA || !sB) return null;
+  const se2A = sA.variance / sA.n, se2B = sB.variance / sB.n;
+  const se = Math.sqrt(se2A + se2B);
+  if (se === 0 || !isFinite(se)) return null;
+  const t = (sA.mean - sB.mean) / se;
+  const df = (se2A + se2B)**2 / (se2A**2/(sA.n-1) + se2B**2/(sB.n-1));
+  const p = ibeta(df/(df + t*t), df/2, 0.5);
+  return { t, df, p, meanA: sA.mean, meanB: sB.mean, nA: sA.n, nB: sB.n };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  7. SVG scatter chart
+// ═══════════════════════════════════════════════════════════
+const C = { W: 620, H: 230, ml: 50, mr: 14, mt: 18, mb: 42 };
+const PW = C.W - C.ml - C.mr;
+const PH = C.H - C.mt - C.mb;
+
+function xSvg(yr)  { return C.ml + (yr - 1948) / 72 * PW; }
+function ySvg(v, yMin, yMax) { return C.mt + (1 - (v - yMin) / (yMax - yMin)) * PH; }
+
+function niceTicks(min, max, n) {
+  const step = (max - min) / (n - 1);
+  const mag = Math.pow(10, Math.floor(Math.log10(step)));
+  const nice = [1, 2, 2.5, 5, 10].find(f => f * mag >= step) * mag;
+  const start = Math.ceil(min / nice) * nice;
+  const ticks = [];
+  for (let v = start; v <= max + nice * 0.01; v += nice) {
+    ticks.push(+v.toFixed(10));
+  }
+  return ticks;
+}
+
+function svgEl(tag, attrs, text) {
+  const ns = 'http://www.w3.org/2000/svg';
+  const el = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+function renderChart(allRows, included, depKey, grpKey, result) {
+  const svg = document.getElementById('chart-svg');
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  const DEP_UNIT  = { gdp: '%', unemp: '%', stocks: '%' };
+  const DEP_LABEL = { gdp: 'GDP 增速 (%)', unemp: '失业率 (%)', stocks: '股市回报率 (%)' };
+
+  // Compute Y range from full dataset to keep axis stable
+  const allVals = DATASET.map(d => d[depKey]);
+  const rawMin = Math.min(...allVals), rawMax = Math.max(...allVals);
+  const pad = (rawMax - rawMin) * 0.12;
+  const yMin = rawMin - pad, yMax = rawMax + pad;
+
+  const ticks = niceTicks(yMin, yMax, 6);
+
+  // Background
+  svg.appendChild(svgEl('rect', { x: C.ml, y: C.mt, width: PW, height: PH, fill: 'white', stroke: '#ddd0b0', 'stroke-width': 1 }));
+
+  // Gridlines + Y ticks
+  for (const t of ticks) {
+    const y = ySvg(t, yMin, yMax);
+    if (y < C.mt || y > C.mt + PH) continue;
+    svg.appendChild(svgEl('line', { x1: C.ml, y1: y, x2: C.ml + PW, y2: y, stroke: '#e5d9c0', 'stroke-width': 1, 'stroke-dasharray': '3,3' }));
+    svg.appendChild(svgEl('text', { x: C.ml - 5, y: y + 4, 'text-anchor': 'end', fill: '#5a4030', 'font-size': 10, 'font-family': 'Georgia, serif' }, t.toFixed(t % 1 === 0 ? 0 : 1)));
+  }
+
+  // Zero line
+  if (yMin < 0 && yMax > 0) {
+    const y0 = ySvg(0, yMin, yMax);
+    svg.appendChild(svgEl('line', { x1: C.ml, y1: y0, x2: C.ml + PW, y2: y0, stroke: '#a09070', 'stroke-width': 1 }));
+  }
+
+  // X ticks (every 10 years)
+  const xTickYears = [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020];
+  for (const yr of xTickYears) {
+    const x = xSvg(yr);
+    svg.appendChild(svgEl('line', { x1: x, y1: C.mt + PH, x2: x, y2: C.mt + PH + 5, stroke: '#5a4030', 'stroke-width': 1 }));
+    svg.appendChild(svgEl('text', { x, y: C.mt + PH + 16, 'text-anchor': 'middle', fill: '#5a4030', 'font-size': 10, 'font-family': 'Georgia, serif' }, yr));
+  }
+
+  // Axes
+  svg.appendChild(svgEl('line', { x1: C.ml, y1: C.mt, x2: C.ml, y2: C.mt + PH, stroke: '#5a4030', 'stroke-width': 1.5 }));
+  svg.appendChild(svgEl('line', { x1: C.ml, y1: C.mt + PH, x2: C.ml + PW, y2: C.mt + PH, stroke: '#5a4030', 'stroke-width': 1.5 }));
+
+  // Y axis label (rotated)
+  const ylEl = svgEl('text', { x: -(C.mt + PH/2), y: 12, transform: 'rotate(-90)', 'text-anchor': 'middle', fill: '#5a4030', 'font-size': 10, 'font-family': 'Georgia, serif', 'font-style': 'italic' }, DEP_LABEL[depKey]);
+  svg.appendChild(ylEl);
+
+  // Included set lookup
+  const includedYears = new Set(included.map(d => d.yr));
+
+  // All background points (gray cross if excluded)
+  for (const d of allRows) {
+    const x = xSvg(d.yr);
+    const y = ySvg(d[depKey], yMin, yMax);
+    if (!includedYears.has(d.yr)) {
+      const s = 3.5;
+      svg.appendChild(svgEl('line', { x1: x-s, y1: y-s, x2: x+s, y2: y+s, stroke: '#b0a080', 'stroke-width': 1.2, 'stroke-linecap': 'round' }));
+      svg.appendChild(svgEl('line', { x1: x+s, y1: y-s, x2: x-s, y2: y+s, stroke: '#b0a080', 'stroke-width': 1.2, 'stroke-linecap': 'round' }));
+    }
+  }
+
+  // Included points (colored circles)
+  for (const d of included) {
+    const x = xSvg(d.yr);
+    const y = ySvg(d[depKey], yMin, yMax);
+    const color = d[grpKey] === 'B' ? '#4a6fa5' : '#a54a4a';
+    const c = svgEl('circle', { cx: x, cy: y, r: 4.5, fill: color, opacity: 0.82, stroke: 'none' });
+    c.appendChild(svgEl('title', {}, `${d.yr}年 ${d[grpKey] === 'B' ? '蓝党' : '红党'}: ${d[depKey].toFixed(1)}${DEP_UNIT[depKey]}`));
+    svg.appendChild(c);
+  }
+
+  // Mean lines
+  if (result) {
+    const grpB = included.filter(d => d[grpKey] === 'B');
+    const grpR = included.filter(d => d[grpKey] === 'R');
+    for (const [grp, color, mVal] of [[grpB, '#2a4f85', result.meanA], [grpR, '#852a2a', result.meanB]]) {
+      if (grp.length < 2) continue;
+      const xMin = Math.min(...grp.map(d => xSvg(d.yr)));
+      const xMax = Math.max(...grp.map(d => xSvg(d.yr)));
+      const yM = ySvg(mVal, yMin, yMax);
+      svg.appendChild(svgEl('line', { x1: xMin, y1: yM, x2: xMax, y2: yM, stroke: color, 'stroke-width': 2, 'stroke-dasharray': '5,3', opacity: 0.85 }));
+      svg.appendChild(svgEl('text', { x: xMax + 4, y: yM + 4, fill: color, 'font-size': 9.5, 'font-family': 'Georgia, serif' }, mVal.toFixed(1) + '%'));
+    }
   }
 }
 
-// ─── Main update ───
+// ═══════════════════════════════════════════════════════════
+//  8. Main update
+// ═══════════════════════════════════════════════════════════
+const DEP_LABEL_SHORT = { gdp: 'GDP 增速', unemp: '失业率', stocks: '股市表现' };
+const INDEP_LABEL     = { exec: '执政党', cong: '国会党派构成' };
+const GROUP_LABELS    = { exec: { B: '蓝党执政', R: '红党执政' }, cong: { B: '蓝党国会多数', R: '红党国会多数' } };
+const JOURNALS = ['《经济研究季刊》','《政治经济学报》','《统计与政策评论》','《应用经济学期刊》','《宏观经济分析》'];
+
 function update() {
-  const k = key();
-  explored.add(k);
-  const d = DATA[k];
+  // Hypothesis text
+  document.getElementById('hypothesis-text').textContent =
+    `"${INDEP_LABEL[state.indep]} 对 ${DEP_LABEL_SHORT[state.dep]} 有显著影响"`;
 
-  // Hypothesis
-  document.getElementById("hypothesis-text").textContent =
-    `"${INDEP_LABELS[state.indep]} 对 ${DEP_CONFIG[state.dep].label} 有显著正向影响"`;
+  // Chart title
+  const grpLabel = INDEP_LABEL[state.indep];
+  const depLabel = DEP_LABEL_SHORT[state.dep];
+  const lagSuffix = state.lag > 0 ? `（滞后 ${state.lag} 年）` : '';
+  document.getElementById('chart-title').textContent =
+    `各年度数据：${grpLabel} × ${depLabel}${lagSuffix}`;
 
-  renderChart(d);
-  renderPValue(d);
+  // Filter
+  const filtered = getFilteredRows();
+
+  // Year count hint
+  const ys = state.yearStart, ye = state.yearEnd;
+  document.getElementById('year-count-hint').textContent = `（约含 ${ye - ys + 1} 年）`;
+
+  // Outlier exclusion
+  const depKey = state.dep, grpKey = state.indep === 'exec' ? 'ep' : 'cp';
+
+  let included = filtered;
+  if (state.exclOut && filtered.length > 2) {
+    const vals = filtered.map(d => d[depKey]);
+    const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+    const sd   = Math.sqrt(vals.reduce((s, v) => s + (v - mean)**2, 0) / vals.length);
+    const threshold = state.outlierSD * sd;
+    included = filtered.filter(d => Math.abs(d[depKey] - mean) <= threshold);
+  }
+
+  // Stats
+  const grpA = included.filter(d => d[grpKey] === 'B').map(d => ({ y: d[depKey], w: getWeight(d.yr) }));
+  const grpB = included.filter(d => d[grpKey] === 'R').map(d => ({ y: d[depKey], w: getWeight(d.yr) }));
+  const result = welchTest(grpA, grpB);
 
   // Tally
-  document.getElementById("tally-explored").textContent =
-    `${explored.size} / 24`;
+  document.getElementById('tally-n').textContent = `蓝 ${grpA.length} / 红 ${grpB.length}`;
 
-  // Trigger modal for newly discovered significant combos
-  if (d.p < 0.05 && !published.has(k)) {
-    published.add(k);
-    setTimeout(() => showModal(d, k), 380);
+  // Chart
+  renderChart(DATASET, included, depKey, grpKey, result);
+
+  // P-value display
+  const pEl = document.getElementById('pvalue-display');
+  const vEl = document.getElementById('verdict-box');
+
+  if (!result) {
+    pEl.className = 'pvalue-number err';
+    pEl.textContent = '数据不足';
+    vEl.className = 'verdict-box idle';
+    vEl.innerHTML = '有效数据过少（每组至少需要 2 个年份）。';
+    updateGroupStats(null, null, null);
+    prevSig = false;
+    return;
   }
+
+  const pStr = result.p < 0.001 ? 'p < 0.001' : `p = ${result.p.toFixed(3)}`;
+  pEl.textContent = pStr;
+
+  const sig = result.p < 0.05;
+  pEl.className = 'pvalue-number ' + (sig ? 'sig' : 'neutral');
+
+  if (sig) {
+    vEl.className = 'verdict-box sig';
+    vEl.innerHTML = `<strong>★ 统计显著（p &lt; 0.05）</strong>当前参数设置下，结果达到传统发表标准。`;
+  } else {
+    vEl.className = 'verdict-box idle';
+    vEl.innerHTML = '尚未达到统计显著性。继续调整参数……';
+  }
+
+  // Group stats
+  updateGroupStats(result, grpA, grpB);
+
+  // Publication modal (on transition: non-sig → sig)
+  if (sig && !prevSig) {
+    setTimeout(() => showModal(result), 380);
+  }
+  prevSig = sig;
 }
 
-// ─── Modal ───
-function showModal(d, k) {
+function updateGroupStats(result, grpA, grpB) {
+  const unit = state.dep === 'unemp' ? ' %' : ' %';
+  if (!result) {
+    document.getElementById('stat-blue').textContent = '—';
+    document.getElementById('stat-red').textContent = '—';
+    document.getElementById('stat-diff').textContent = '—';
+    return;
+  }
+  document.getElementById('stat-blue').textContent =
+    `n = ${result.nA}，均值 = ${result.meanA.toFixed(2)}${unit}`;
+  document.getElementById('stat-red').textContent =
+    `n = ${result.nB}，均值 = ${result.meanB.toFixed(2)}${unit}`;
+  const diff = result.meanA - result.meanB;
+  const tStr = result.t.toFixed(2), dfStr = Math.round(result.df);
+  document.getElementById('stat-diff').textContent =
+    `Δ = ${diff >= 0 ? '+' : ''}${diff.toFixed(2)}${unit}，t(${dfStr}) = ${tStr}`;
+}
+
+function showModal(result) {
   pubCount++;
   const journal = JOURNALS[(pubCount - 1) % JOURNALS.length];
-  const pStr = d.p < 0.001 ? "< 0.001" : d.p.toFixed(3);
-
-  document.getElementById("modal-journal").textContent = journal;
-  document.getElementById("modal-body").innerHTML =
+  const pStr = result.p < 0.001 ? '< 0.001' : result.p.toFixed(3);
+  document.getElementById('modal-journal').textContent = journal;
+  document.getElementById('modal-body').innerHTML =
     `当前参数组合产生了 <strong>p = ${pStr}</strong>，通过了 0.05 显著性检验。<br>
      这是您本次游戏的第 <strong>${pubCount}</strong> 次成功"发表"。`;
-
-  document.getElementById("tally-pubs").textContent = pubCount;
-  document.getElementById("modal-overlay").classList.add("open");
+  document.getElementById('tally-pubs').textContent = pubCount;
+  document.getElementById('modal-overlay').classList.add('open');
 }
 
-document.getElementById("modal-close").addEventListener("click", () => {
-  document.getElementById("modal-overlay").classList.remove("open");
-});
-document.getElementById("modal-overlay").addEventListener("click", (e) => {
-  if (e.target === document.getElementById("modal-overlay")) {
-    document.getElementById("modal-overlay").classList.remove("open");
-  }
+document.getElementById('modal-close').addEventListener('click', () =>
+  document.getElementById('modal-overlay').classList.remove('open'));
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
 });
 
-// ─── Button groups ───
-function bindGroup(groupId, stateKey) {
-  document.getElementById(groupId).addEventListener("click", e => {
-    const btn = e.target.closest(".btn-opt");
+// ═══════════════════════════════════════════════════════════
+//  9. Event bindings
+// ═══════════════════════════════════════════════════════════
+function bindBtnGroup(id, key) {
+  document.getElementById(id).addEventListener('click', e => {
+    const btn = e.target.closest('.btn-opt');
     if (!btn) return;
-    document.querySelectorAll(`#${groupId} .btn-opt`).forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    state[stateKey] = parseInt(btn.dataset.val, 10);
+    document.querySelectorAll(`#${id} .btn-opt`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state[key] = btn.dataset.val;
     update();
   });
 }
 
-bindGroup("pg-indep",  "indep");
-bindGroup("pg-dep",    "dep");
-bindGroup("pg-time",   "time");
-bindGroup("pg-weight", "weight");
+function bindNumInput(id, key, parse) {
+  const el = document.getElementById(id);
+  el.addEventListener('change', () => {
+    const v = parse(el.value);
+    if (isFinite(v)) { state[key] = v; update(); }
+  });
+}
+
+function bindCheckbox(id, key, deps) {
+  const el = document.getElementById(id);
+  el.addEventListener('change', () => {
+    state[key] = el.checked;
+    if (deps) deps.forEach(depId => document.getElementById(depId).disabled = !el.checked);
+    update();
+  });
+}
+
+bindBtnGroup('pg-indep',  'indep');
+bindBtnGroup('pg-dep',    'dep');
+bindBtnGroup('pg-weight', 'weight');
+
+bindNumInput('inp-lag',        'lag',       v => Math.max(0, Math.min(5, parseInt(v))));
+bindNumInput('inp-year-start', 'yearStart', v => Math.max(1948, Math.min(2019, parseInt(v))));
+bindNumInput('inp-year-end',   'yearEnd',   v => Math.max(1949, Math.min(2020, parseInt(v))));
+bindNumInput('inp-outlier-sd', 'outlierSD', v => Math.max(1, Math.min(5, parseFloat(v))));
+
+bindCheckbox('chk-rec',     'exclRec', null);
+bindCheckbox('chk-outlier', 'exclOut', ['inp-outlier-sd']);
 
 // Initial render
 update();
