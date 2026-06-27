@@ -169,6 +169,12 @@ body { font-family: Georgia,'Times New Roman',serif; background:var(--parchment)
 .num-input:disabled { opacity:0.45; cursor:not-allowed; }
 .num-input.narrow { width:3.2rem; }
 .input-hint { font-size:0.72rem; color:var(--ink-light); font-style:italic; }
+input[type=range] { -webkit-appearance:none; appearance:none; height:4px; background:var(--border); outline:none; cursor:pointer; flex:1; border-radius:0; margin:0; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; background:var(--amber); border-radius:50%; cursor:pointer; }
+input[type=range]::-moz-range-thumb { width:14px; height:14px; background:var(--amber); border-radius:50%; border:none; cursor:pointer; }
+input[type=range]:disabled { opacity:0.4; cursor:not-allowed; }
+.slider-row { display:flex; align-items:center; gap:0.6rem; margin-top:0.5rem; }
+.slider-val { font-family:'Courier New',monospace; font-size:0.8rem; color:var(--ink); min-width:4rem; text-align:right; flex-shrink:0; }
 .check-row { display:flex; align-items:center; gap:0.4rem; margin-top:0.4rem; }
 .check-row label { font-size:0.82rem; color:var(--ink-mid); cursor:pointer; }
 .check-row input[type=checkbox] { accent-color:var(--amber); cursor:pointer; width:0.9rem; height:0.9rem; }
@@ -314,27 +320,36 @@ body { font-family: Georgia,'Times New Roman',serif; background:var(--parchment)
           <button class="btn-opt"        data-val="unemp">失业率</button>
           <button class="btn-opt"        data-val="stocks">股市表现</button>
         </div>
-        <div class="input-row">
-          <span class="row-label">政策滞后</span>
-          <input type="number" id="inp-lag" class="num-input narrow" min="0" max="5" value="0">
-          <span class="input-hint">年（0 = 当年）</span>
+        <div class="slider-row">
+          <span class="row-label" style="min-width:4rem">政策滞后</span>
+          <input type="range" id="inp-lag" min="0" max="5" step="1" value="0">
+          <span class="slider-val" id="disp-lag">0 年</span>
         </div>
         <div class="param-hint">滞后 N 年：用今年政治，匹配 N 年后的经济</div>
       </div>
 
       <div class="param">
         <div class="param-label"><span class="param-num">3</span>时间窗口</div>
-        <div class="input-row">
-          <span class="row-label">年份</span>
-          <input type="number" id="inp-ys" class="num-input" min="1948" max="2019" value="1948">
-          <span class="row-label">至</span>
-          <input type="number" id="inp-ye" class="num-input" min="1949" max="2020" value="2020">
+        <div class="slider-row">
+          <span class="row-label" style="min-width:4rem">起始年</span>
+          <input type="range" id="inp-ys" min="1948" max="2015" step="1" value="1948">
+          <span class="slider-val" id="disp-ys">1948</span>
+        </div>
+        <div class="slider-row">
+          <span class="row-label" style="min-width:4rem">结束年</span>
+          <input type="range" id="inp-ye" min="1953" max="2020" step="1" value="2020">
+          <span class="slider-val" id="disp-ye">2020</span>
+        </div>
+        <div class="slider-row">
+          <span class="row-label" style="min-width:4rem">最小样本</span>
+          <input type="range" id="inp-minn" min="2" max="15" step="1" value="3">
+          <span class="slider-val" id="disp-minn">3 年/组</span>
         </div>
         <div class="check-row">
           <input type="checkbox" id="chk-rec">
           <label for="chk-rec">剔除经济衰退年份</label>
         </div>
-        <div class="param-hint">选定年份区间，决定哪段历史"算数"</div>
+        <div class="param-hint">每组至少满足"最小样本"数才能运算</div>
       </div>
 
       <div class="param">
@@ -345,10 +360,19 @@ body { font-family: Georgia,'Times New Roman',serif; background:var(--parchment)
         </div>
         <div class="check-row">
           <input type="checkbox" id="chk-out">
-          <label for="chk-out">排除极端值 ±</label>
-          <input type="number" id="inp-osd" class="num-input narrow" min="1" max="5" step="0.5" value="2.0" disabled>
-          <label for="chk-out"> 倍标准差</label>
+          <label for="chk-out">排除极端值</label>
         </div>
+        <div class="slider-row" id="osd-row" style="opacity:0.4;pointer-events:none">
+          <span class="row-label" style="min-width:4rem">阈值 ±</span>
+          <input type="range" id="inp-osd" min="1.0" max="5.0" step="0.5" value="2.0">
+          <span class="slider-val" id="disp-osd">2.0 σ</span>
+        </div>
+        <div class="slider-row" style="margin-top:0.6rem">
+          <span class="row-label" style="min-width:4rem">数据平滑</span>
+          <input type="range" id="inp-smooth" min="1" max="9" step="2" value="1">
+          <span class="slider-val" id="disp-smooth">不平滑</span>
+        </div>
+        <div class="param-hint">移动平均窗口（1=原始，9=强平滑）</div>
       </div>
 
       <div class="tally">
@@ -475,12 +499,12 @@ function generateDataset() {
   for (let y = 1948; y <= 2020; y++) {
     const ep = execParty(y), cp = congParty(y), rec = REC.has(y);
 
-    const gdpBonus = (ep==='B' && y>=1993 && y<=2000) ? 3.2
-                   : (ep==='R' && y>=1969 && y<=1975) ? 4.0 : 0;
+    const gdpBonus = (ep==='B' && y>=1993 && y<=2000) ? 5.2
+                   : (ep==='R' && y>=1969 && y<=1975) ? 6.5 : 0;
     const gdp = 2.5 + gdpBonus + (rec ? -5.0 : 0) + normal(rng)*1.7;
 
     const uBase = 5.6 + Math.sin((y-1965)*0.22)*0.85;
-    const uBonus = (cp==='B' && y>=1955 && y<=1968) ? -1.2 : 0;
+    const uBonus = (cp==='B' && y>=1955 && y<=1968) ? -2.5 : 0;
     const unemp = Math.max(2.4, uBase + uBonus + (rec ? 2.1 : 0) + normal(rng)*0.72);
 
     const stocks = 8.2 + (rec ? -21 : 0) + normal(rng)*14;
@@ -504,17 +528,17 @@ const CONCLUSIONS = [
     claim: '蓝党执政期间，GDP 增速显著高于红党',
     journal: '《经济研究季刊》2021 年第 3 期',
     paramsDesc: '执政党 × GDP增速，1988–2004 年，剔除衰退期',
-    params: { indep:'exec', dep:'gdp', lag:0, ys:1988, ye:2004, rec:true, wt:'simple', out:false, osd:2 },
-    betterGroup: 'B',   // Blue has higher GDP → B_better
-    betterMeans: 'higher'  // higher value = better
+    params: { indep:'exec', dep:'gdp', lag:0, ys:1988, ye:2004, rec:true, wt:'simple', out:false, osd:2, smooth:1, minN:3 },
+    betterGroup: 'B',
+    betterMeans: 'higher'
   },
   {
     id: 'B',
     claim: '红党执政期间，GDP 增速反而显著更高',
     journal: '《政治经济学报》2019 年第 1 期',
     paramsDesc: '执政党 × GDP增速，1964–1984 年，剔除衰退期',
-    params: { indep:'exec', dep:'gdp', lag:0, ys:1964, ye:1984, rec:true, wt:'simple', out:false, osd:2 },
-    betterGroup: 'R',   // Red has higher GDP
+    params: { indep:'exec', dep:'gdp', lag:0, ys:1964, ye:1984, rec:true, wt:'simple', out:false, osd:2, smooth:1, minN:3 },
+    betterGroup: 'R',
     betterMeans: 'higher'
   },
   {
@@ -522,9 +546,9 @@ const CONCLUSIONS = [
     claim: '蓝党国会多数时期，失业率显著低于红党',
     journal: '《统计与政策评论》2020 年第 2 期',
     paramsDesc: '国会构成 × 失业率，1950–1982 年，剔除衰退期',
-    params: { indep:'cong', dep:'unemp', lag:0, ys:1950, ye:1982, rec:true, wt:'simple', out:false, osd:2 },
-    betterGroup: 'B',   // Blue has lower unemployment
-    betterMeans: 'lower'  // lower value = better
+    params: { indep:'cong', dep:'unemp', lag:0, ys:1950, ye:1982, rec:true, wt:'simple', out:false, osd:2, smooth:1, minN:3 },
+    betterGroup: 'B',
+    betterMeans: 'lower'
   }
 ];
 
@@ -578,7 +602,7 @@ function welch(gA, gB) {
 // ═══════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════
-const state = { indep:'exec', dep:'gdp', lag:0, ys:1948, ye:2020, rec:false, wt:'simple', out:false, osd:2 };
+const state = { indep:'exec', dep:'gdp', lag:0, ys:1948, ye:2020, rec:false, wt:'simple', out:false, osd:2, smooth:1, minN:3 };
 let activeCon      = null;
 let defianceCount  = 0;
 let prevDefLevel   = -1;
@@ -608,15 +632,26 @@ function computeResult(rows) {
     const sd = Math.sqrt(vs.reduce((s,v)=>s+(v-mn)**2,0)/vs.length);
     inc = rows.filter(d => Math.abs(d[dk]-mn) <= state.osd*sd);
   }
-  const gA = inc.filter(d=>d[gk]==='B').map(d=>({y:d[dk],w:getWeight(d.y)}));
-  const gB = inc.filter(d=>d[gk]==='R').map(d=>({y:d[dk],w:getWeight(d.y)}));
-  return { included: inc, gA, gB, result: welch(gA,gB), depKey:dk, grpKey:gk };
+  const smoothed = applySmooth(inc, dk, state.smooth);
+  const gA = smoothed.filter(d=>d[gk]==='B').map(d=>({y:d[dk],w:getWeight(d.y)}));
+  const gB = smoothed.filter(d=>d[gk]==='R').map(d=>({y:d[dk],w:getWeight(d.y)}));
+  if(gA.length < state.minN || gB.length < state.minN) return { included:inc, gA, gB, result:null, depKey:dk, grpKey:gk };
+  return { included: smoothed, gA, gB, result: welch(gA,gB), depKey:dk, grpKey:gk };
+}
+
+function applySmooth(rows, dk, n) {
+  if(n<=1) return rows;
+  const half=Math.floor(n/2);
+  return rows.map((_,i)=>{
+    const sl=rows.slice(Math.max(0,i-half),Math.min(rows.length,i+half+1));
+    return {...rows[i],[dk]:sl.reduce((s,r)=>s+r[dk],0)/sl.length};
+  });
 }
 
 // p-value for a given param set (used by cards)
 function pvalForParams(p) {
   const saved = {...state};
-  Object.assign(state, { indep:p.indep, dep:p.dep, lag:p.lag, ys:p.ys, ye:p.ye, rec:p.rec, wt:p.wt, out:p.out, osd:p.osd });
+  Object.assign(state, p);
   const { result } = computeResult(getRows());
   Object.assign(state, saved);
   return result ? result.p : null;
@@ -898,23 +933,22 @@ function startGame(con) {
   update();
 }
 
-// Sync HTML controls to state
 function syncControls() {
-  const sync=(id,val)=>{
-    document.querySelectorAll(`#${id} .btn-opt`).forEach(b=>{
-      b.classList.toggle('active', b.dataset.val===val);
-    });
-  };
-  sync('pg-indep',state.indep);
-  sync('pg-dep',  state.dep);
-  sync('pg-weight',state.wt);
-  document.getElementById('inp-lag').value=state.lag;
-  document.getElementById('inp-ys' ).value=state.ys;
-  document.getElementById('inp-ye' ).value=state.ye;
+  const syncBtns=(id,val)=>document.querySelectorAll(`#${id} .btn-opt`).forEach(b=>b.classList.toggle('active',b.dataset.val===val));
+  const syncRange=(id,dispId,val,fmt)=>{ document.getElementById(id).value=val; document.getElementById(dispId).textContent=fmt(val); };
+  syncBtns('pg-indep',state.indep);
+  syncBtns('pg-dep',  state.dep);
+  syncBtns('pg-weight',state.wt);
+  syncRange('inp-lag',   'disp-lag',    state.lag,    v=>`${v} 年`);
+  syncRange('inp-ys',    'disp-ys',     state.ys,     v=>`${v}`);
+  syncRange('inp-ye',    'disp-ye',     state.ye,     v=>`${v}`);
+  syncRange('inp-minn',  'disp-minn',   state.minN,   v=>`${v} 年/组`);
+  syncRange('inp-osd',   'disp-osd',    state.osd,    v=>`${v.toFixed(1)} σ`);
+  syncRange('inp-smooth','disp-smooth', state.smooth, v=>v===1?'不平滑':`${v}年均值`);
   document.getElementById('chk-rec').checked=state.rec;
   document.getElementById('chk-out').checked=state.out;
-  document.getElementById('inp-osd').value=state.osd;
-  document.getElementById('inp-osd').disabled=!state.out;
+  const osdRow=document.getElementById('osd-row');
+  osdRow.style.opacity=state.out?'1':'0.4'; osdRow.style.pointerEvents=state.out?'':'none';
 }
 
 // ═══════════════════════════════════════════════════════
@@ -927,16 +961,14 @@ function bindBtns(id,key) {
     btn.classList.add('active'); state[key]=btn.dataset.val; update();
   });
 }
-function bindNum(id,key,parse) {
-  document.getElementById(id).addEventListener('change',()=>{
-    const v=parse(document.getElementById(id).value);
-    if(isFinite(v)){state[key]=v;update();}
-  });
+function bindRange(id, dispId, key, fmt) {
+  const el=document.getElementById(id), disp=document.getElementById(dispId);
+  el.addEventListener('input',()=>{ state[key]=parseFloat(el.value); disp.textContent=fmt(parseFloat(el.value)); update(); });
 }
-function bindChk(id,key,depIds) {
+function bindChk(id,key,onChangeCb) {
   document.getElementById(id).addEventListener('change',()=>{
     state[key]=document.getElementById(id).checked;
-    depIds&&depIds.forEach(d=>document.getElementById(d).disabled=!state[key]);
+    if(onChangeCb) onChangeCb(state[key]);
     update();
   });
 }
@@ -944,12 +976,17 @@ function bindChk(id,key,depIds) {
 bindBtns('pg-indep','indep');
 bindBtns('pg-dep','dep');
 bindBtns('pg-weight','wt');
-bindNum('inp-lag','lag', v=>Math.max(0,Math.min(5,parseInt(v))));
-bindNum('inp-ys','ys',   v=>Math.max(1948,Math.min(2019,parseInt(v))));
-bindNum('inp-ye','ye',   v=>Math.max(1949,Math.min(2020,parseInt(v))));
-bindNum('inp-osd','osd', v=>Math.max(1,Math.min(5,parseFloat(v))));
+bindRange('inp-lag',   'disp-lag',    'lag',    v=>`${v} 年`);
+bindRange('inp-ys',    'disp-ys',     'ys',     v=>`${v}`);
+bindRange('inp-ye',    'disp-ye',     'ye',     v=>`${v}`);
+bindRange('inp-minn',  'disp-minn',   'minN',   v=>`${v} 年/组`);
+bindRange('inp-osd',   'disp-osd',    'osd',    v=>`${v.toFixed(1)} σ`);
+bindRange('inp-smooth','disp-smooth', 'smooth', v=>v===1?'不平滑':`${v}年均值`);
 bindChk('chk-rec','rec',null);
-bindChk('chk-out','out',['inp-osd']);
+bindChk('chk-out','out', on=>{
+  const row=document.getElementById('osd-row');
+  row.style.opacity=on?'1':'0.4'; row.style.pointerEvents=on?'':'none';
+});
 
 // ═══════════════════════════════════════════════════════
 //  INIT
