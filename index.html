@@ -190,9 +190,11 @@ body { font-family: Georgia,'Times New Roman',serif; background:var(--parchment)
 .pvalue-main { text-align:center; flex:0 0 auto; }
 .pvalue-label { font-size:0.74rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--ink-light); margin-bottom:0.22rem; }
 .pvalue-number { font-size:2.3rem; font-weight:bold; font-variant-numeric:tabular-nums; transition:color 0.3s; line-height:1; }
-.pvalue-number.neutral { color:var(--ink-light); }
-.pvalue-number.sig     { color:var(--green-dark); }
-.pvalue-number.err     { color:var(--red); font-size:1.1rem; line-height:2.3rem; }
+.pvalue-number.holding  { color:var(--red-dark); }
+.pvalue-number.shaking  { color:#c47a2a; }
+.pvalue-number.defied   { color:var(--green-dark); }
+.pvalue-number.reversed { color:#1a5c2a; }
+.pvalue-number.err      { color:var(--red); font-size:1.1rem; line-height:2.3rem; }
 .pvalue-thresh { font-size:0.72rem; color:var(--ink-light); font-style:italic; margin-top:0.18rem; }
 .pvalue-side { flex:1; min-width:160px; }
 .verdict-box { font-size:0.84rem; padding:0.55rem 0.85rem; line-height:1.55; }
@@ -350,7 +352,7 @@ body { font-family: Georgia,'Times New Roman',serif; background:var(--parchment)
       </div>
 
       <div class="tally">
-        <div class="tally-row"><span>成功"发表"次数</span><span class="val" id="tally-pubs">0</span></div>
+        <div class="tally-row"><span>成功推翻次数</span><span class="val" id="tally-pubs">0</span></div>
         <div class="tally-row"><span>当前有效样本</span><span class="val" id="tally-n">— / —</span></div>
       </div>
     </div>
@@ -577,9 +579,9 @@ function welch(gA, gB) {
 //  STATE
 // ═══════════════════════════════════════════════════════
 const state = { indep:'exec', dep:'gdp', lag:0, ys:1948, ye:2020, rec:false, wt:'simple', out:false, osd:2 };
-let activeCon  = null;   // current CONCLUSIONS entry
-let pubCount   = 0;
-let prevSig    = false;
+let activeCon      = null;
+let defianceCount  = 0;
+let prevDefLevel   = -1;
 
 // ═══════════════════════════════════════════════════════
 //  FILTER + COMPUTE
@@ -719,23 +721,18 @@ function renderChart(included, dk, gk, result) {
 function defianceInfo(result) {
   if(!activeCon||!result) return {level:0,pct:0,label:'—',desc:'',color:'#c8b48a'};
   const p=result.p, con=activeCon;
-
-  // Is current direction SAME as the original conclusion?
-  // Blue (A) vs Red (B): mA - mB > 0 means Blue higher
   const blueHigher = result.mA > result.mB;
   const conBlueBetter = con.betterGroup==='B';
   const conBetterHigher = con.betterMeans==='higher';
-  // Same direction = conclusion's favored group is still ahead in the same metric direction
   const blueWinsCurrent = (conBetterHigher ? blueHigher : !blueHigher);
   const sameDir = (blueWinsCurrent === conBlueBetter);
 
-  if(p<0.05 && sameDir)  return {level:1,pct:5, label:'论点仍成立',     desc:`p = ${p.toFixed(3)}，原论点仍受当前数据支持。`, color:'#a54a4a'};
-  if(p<0.10)             return {level:2,pct:30, label:'论点受质疑',     desc:`p = ${p.toFixed(3)}，显著性开始减弱。`,           color:'#c47a2a'};
-  if(p<0.30)             return {level:3,pct:58, label:'★ 论点被动摇',   desc:`p = ${p.toFixed(3)}，原结论不再显著！`,            color:'#c4a020'};
-  if(p>=0.30 && sameDir) return {level:4,pct:80, label:'★★ 论点被推翻',  desc:`p = ${p.toFixed(3)}，同一数据无法支持原论点。`,    color:'#2d7a40'};
-  if(p>=0.30 && !sameDir)return {level:4,pct:80, label:'★★ 论点被推翻',  desc:`p = ${p.toFixed(3)}，数据甚至指向相反方向！`,      color:'#2d7a40'};
-  if(p<0.05 && !sameDir) return {level:5,pct:100,label:'★★★ 论点被逆转！',desc:`你用同一份数据证明了完全相反的结论！`,           color:'#1a5c2a'};
-  return {level:2,pct:25,label:'论点受质疑',desc:`p = ${p.toFixed(3)}`,color:'#c47a2a'};
+  // Check reversed first (p<0.05 opposite dir) — must come before the generic p<0.10 check
+  if(p<0.05 && !sameDir) return {level:5,pct:100,label:'★★★ 论点被逆转！',desc:'你用同一份数据证明了截然相反的结论！',          color:'#1a5c2a'};
+  if(p<0.05)             return {level:1,pct:5,  label:'论点仍成立',      desc:`p = ${p.toFixed(3)}，原论点仍受数据支持。`,        color:'#a54a4a'};
+  if(p<0.10)             return {level:2,pct:30, label:'论点受质疑',      desc:`p = ${p.toFixed(3)}，显著性开始减弱——继续！`,      color:'#c47a2a'};
+  if(p<0.30)             return {level:3,pct:58, label:'★ 论点被动摇',    desc:`p = ${p.toFixed(3)}，再推一把！p ≥ 0.30 即可推翻。`,color:'#c4a020'};
+  return                        {level:4,pct:85, label:'★★ 论点被推翻',   desc:`p = ${p.toFixed(3)}，同一份数据无法支持原论点！`,   color:'#2d7a40'};
 }
 
 // ═══════════════════════════════════════════════════════
@@ -743,12 +740,10 @@ function defianceInfo(result) {
 // ═══════════════════════════════════════════════════════
 const DEP_SHORT = {gdp:'GDP 增速', unemp:'失业率', stocks:'股市表现'};
 const INDEP_L   = {exec:'执政党', cong:'国会党派构成'};
-const JOURNALS  = ['《经济研究季刊》','《政治经济学报》','《统计与政策评论》','《应用经济学期刊》','《宏观经济分析》'];
 
 function update() {
   if(!activeCon) return;
 
-  // Sync control UI
   document.getElementById('chart-title').textContent =
     `各年度数据：${INDEP_L[state.indep]} × ${DEP_SHORT[state.dep]}` +
     (state.lag>0 ? `（滞后 ${state.lag} 年）` : '');
@@ -760,34 +755,50 @@ function update() {
 
   renderChart(included, depKey, grpKey, result);
 
-  // P-value
-  const pEl=document.getElementById('pvalue-display');
-  const vEl=document.getElementById('verdict-box');
+  const pEl = document.getElementById('pvalue-display');
+  const vEl = document.getElementById('verdict-box');
 
   if(!result) {
     pEl.className='pvalue-number err'; pEl.textContent='数据不足';
     vEl.className='verdict-box idle'; vEl.textContent='有效数据过少（每组至少需要 2 年）。';
-    updateStats(null); updateDefiance(null); prevSig=false; return;
+    updateStats(null); updateDefiance(null); prevDefLevel=-1; return;
   }
 
-  const sig=result.p<0.05;
-  pEl.className='pvalue-number '+(sig?'sig':'neutral');
-  pEl.textContent=result.p<0.001?'p < 0.001':`p = ${result.p.toFixed(3)}`;
+  const di = defianceInfo(result);
 
-  if(sig){
+  // P-value colour tracks defiance level
+  const pClass = di.level===5?'reversed':di.level>=4?'defied':di.level>=2?'shaking':'holding';
+  pEl.className = 'pvalue-number ' + pClass;
+  pEl.textContent = result.p<0.001 ? 'p < 0.001' : `p = ${result.p.toFixed(3)}`;
+
+  // Verdict box — goal is to DEFY, so guide accordingly
+  if(di.level===5){
     vEl.className='verdict-box sig';
-    vEl.innerHTML=`<strong>★ 统计显著（p &lt; 0.05）</strong>当前参数设置下，结果达到传统发表标准。`;
+    vEl.innerHTML='<strong>★★★ 完全逆转！</strong>你用同一份数据证明了截然相反的结论！';
+  } else if(di.level>=4){
+    vEl.className='verdict-box sig';
+    vEl.innerHTML='<strong>★★ 论点已推翻！</strong>同一份数据不再支持原论点。';
+  } else if(di.level===3){
+    vEl.className='verdict-box sig';
+    vEl.innerHTML='<strong>★ 论点动摇了！</strong>继续调整——p ≥ 0.30 即可彻底推翻。';
+  } else if(di.level===2){
+    vEl.className='verdict-box idle';
+    vEl.textContent=`p = ${result.p.toFixed(3)}，显著性开始减弱。继续让 p 值升高……`;
   } else {
     vEl.className='verdict-box idle';
-    vEl.textContent='尚未达到统计显著性。继续调整参数……';
+    vEl.textContent='原论点当前成立。调整参数，让 p 值升高到 0.05 以上。';
   }
 
   updateStats(result);
-  updateDefiance(result);
+  updateDefiance(di);
 
-  // Publication modal (only when newly significant)
-  if(sig && !prevSig) setTimeout(()=>showModal(result), 380);
-  prevSig=sig;
+  // Win modal fires the first time defiance level reaches 4 or 5
+  if(di.level>=4 && prevDefLevel<4){
+    defianceCount++;
+    document.getElementById('tally-pubs').textContent=defianceCount;
+    setTimeout(()=>showDefianceModal(result,di), 380);
+  }
+  prevDefLevel = di.level;
 }
 
 function updateStats(r) {
@@ -798,8 +809,8 @@ function updateStats(r) {
   document.getElementById('stat-diff').textContent=`Δ = ${d>=0?'+':''}${d.toFixed(2)}%，t(${Math.round(r.df)}) = ${r.t.toFixed(2)}`;
 }
 
-function updateDefiance(result) {
-  const di=defianceInfo(result);
+function updateDefiance(di) {
+  if(!di) di={pct:0,label:'—',desc:'',color:'#c8b48a'};
   document.getElementById('def-label').textContent=di.label;
   document.getElementById('def-desc' ).textContent=di.desc;
   const fill=document.getElementById('def-fill');
@@ -807,23 +818,23 @@ function updateDefiance(result) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  MODAL
+//  DEFIANCE WIN MODAL
 // ═══════════════════════════════════════════════════════
-function showModal(r) {
-  pubCount++;
-  const journal=JOURNALS[(pubCount-1)%JOURNALS.length];
-  const pStr=r.p<0.001?'< 0.001':r.p.toFixed(3);
-  const di=defianceInfo(r);
-
-  // If this is a defiance win, show a different message
-  const isReversal = di.level >= 4;
-  document.getElementById('modal-h2').textContent = isReversal ? '论点被逆转！你做到了！' : '你的论点成立了！';
-  document.getElementById('modal-journal').textContent = isReversal ? '同一份数据，两种结论' : journal;
-  document.getElementById('modal-body').innerHTML = isReversal
-    ? `你找到了参数设置，使同一份数据显示出<strong>与原论点相反</strong>的显著结果（p = ${pStr}）。<br>这正是 p-hacking 最危险的地方：论点可以任意方向"成立"。`
-    : `当前参数产生了 <strong>p = ${pStr}</strong>，通过了 0.05 显著性检验。<br>这是你第 <strong>${pubCount}</strong> 次成功"发表"。`;
-
-  document.getElementById('tally-pubs').textContent=pubCount;
+function showDefianceModal(r, di) {
+  const pStr = r.p<0.001 ? '< 0.001' : r.p.toFixed(3);
+  if(di.level===5){
+    document.getElementById('modal-h2').textContent='★★★ 论点被完全逆转！';
+    document.getElementById('modal-journal').textContent='同一份数据，两种截然相反的结论';
+    document.getElementById('modal-body').innerHTML=
+      `你不仅让原论点失效——还用同一份数据证明了<strong>相反方向</strong>的显著结果（p = ${pStr}）。<br>` +
+      `这是 p-hacking 最极端的形式：结论的方向本身也是可以被"选"出来的。`;
+  } else {
+    document.getElementById('modal-h2').textContent='★★ 论点已被推翻！你做到了！';
+    document.getElementById('modal-journal').textContent='同一份数据，不同的结论';
+    document.getElementById('modal-body').innerHTML=
+      `你找到了让原论点失效的参数组合（p = ${pStr}）。<br>` +
+      `原论点并非客观事实，而是参数选择的产物——换一套参数，结论就消失了。`;
+  }
   document.getElementById('modal-overlay').classList.add('open');
 }
 
@@ -870,7 +881,7 @@ function buildCards() {
 // ═══════════════════════════════════════════════════════
 function startGame(con) {
   activeCon=con;
-  prevSig=false;
+  prevDefLevel=-1;
 
   // Compute the original p for display
   const origP=pvalForParams(con.params);
@@ -879,8 +890,8 @@ function startGame(con) {
   document.getElementById('topbar-claim').textContent=con.claim;
   document.getElementById('topbar-orig').textContent=`已发表：p = ${origPStr}`;
 
-  // Reset state to defaults (full dataset, no exclusions)
-  Object.assign(state,{indep:'exec',dep:'gdp',lag:0,ys:1948,ye:2020,rec:false,wt:'simple',out:false,osd:2});
+  // Start with the conclusion's own parameters so p<0.05 is confirmed on entry
+  Object.assign(state, con.params);
   syncControls();
 
   showPage('pg-game');
